@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset>
+	<sys_file_reference>
+		<uid>1</uid>
+		<pid>130</pid>
+		<tstamp>1401292012</tstamp>
+		<crdate>1401292012</crdate>
+		<cruser_id>1</cruser_id>
+		<sorting>256</sorting>
+		<uid_local>25</uid_local>
+		<uid_foreign>89</uid_foreign>
+		<tablenames>tt_content</tablenames>
+		<fieldname>media</fieldname>
+		<sorting_foreign>1</sorting_foreign>
+		<table_local>sys_file</table_local>
+	</sys_file_reference>
+</dataset>

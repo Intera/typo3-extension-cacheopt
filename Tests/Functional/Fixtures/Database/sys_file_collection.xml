@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset>
+	<sys_file_collection>
+		<uid>1</uid>
+		<pid>131</pid>
+		<crdate>1401292072</crdate>
+		<tstamp>1401292050</tstamp>
+		<cruser_id>1</cruser_id>
+		<title>testdirectory</title>
+		<type>folder</type>
+		<storage>1</storage>
+		<folder>/testdirectory_referenced/</folder>
+	</sys_file_collection>
+</dataset>

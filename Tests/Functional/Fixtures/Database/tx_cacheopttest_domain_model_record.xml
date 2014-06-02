@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset>
+	<tx_cacheopttest_domain_model_record>
+		<uid>1</uid>
+		<pid>135</pid>
+		<tstamp>1401389770</tstamp>
+		<crdate>1401389770</crdate>
+		<cruser_id>1</cruser_id>
+		<title>testrecord</title>
+	</tx_cacheopttest_domain_model_record>
+</dataset>

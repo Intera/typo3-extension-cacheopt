@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset>
+	<be_users>
+		<uid>2</uid>
+		<pid>0</pid>
+		<tstamp>1370009282</tstamp>
+		<username>_cli_phpunit</username>
+		<password>3b39e927252519dbfc099ea16d7c1518</password>
+		<crdate>1370009282</crdate>
+		<cruser_id>1</cruser_id>
+		<workspace_perms>1</workspace_perms>
+		<disableIPlock>1</disableIPlock>
+		<lastlogin>1371033743</lastlogin>
+		<workspace_preview>1</workspace_preview>
+	</be_users>
+	<be_users>
+		<uid>4</uid>
+		<pid>0</pid>
+		<tstamp>1381919418</tstamp>
+		<username>_cli_scheduler</username>
+		<password>$P$CsB4D0cK.qg8iyJAbp4l7Cs7UTyZGw1</password>
+		<crdate>1381919418</crdate>
+		<cruser_id>1</cruser_id>
+		<workspace_perms>1</workspace_perms>
+		<disableIPlock>1</disableIPlock>
+		<lastlogin>1371033743</lastlogin>
+		<workspace_preview>1</workspace_preview>
+	</be_users>
+	<be_users>
+		<uid>5</uid>
+		<pid>0</pid>
+		<tstamp>1382365029</tstamp>
+		<username>_cli_lowlevel</username>
+		<password>$P$CsB4D0cK.qg8iyJAbp4l7Cs7UTyZGw1</password>
+		<crdate>1382365029</crdate>
+		<cruser_id>1</cruser_id>
+		<workspace_perms>1</workspace_perms>
+		<disableIPlock>1</disableIPlock>
+		<lastlogin>1371033743</lastlogin>
+		<workspace_preview>1</workspace_preview>
+	</be_users>
+</dataset>

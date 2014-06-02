@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset>
+	<sys_template>
+		<uid>1</uid>
+		<pid>128</pid>
+		<tstamp>1401434980</tstamp>
+		<crdate>1401434943</crdate>
+		<cruser_id>1</cruser_id>
+		<title>root</title>
+		<root>1</root>
+		<clear>3</clear>
+		<include_static_file>EXT:css_styled_content/static/</include_static_file>
+		<config>
+			<![CDATA[
+				<INCLUDE_TYPOSCRIPT: source="FILE: EXT:cacheopt/Tests/Functional/Fixtures/TypoScript/RootTemplateSetup.ts">
+			]]>
+		</config>
+		<constants>
+			<![CDATA[
+				<INCLUDE_TYPOSCRIPT: source="FILE: EXT:cacheopt/Tests/Functional/Fixtures/TypoScript/RootTemplateConstants.ts">
+			]]>
+		</constants>
+	</sys_template>
+</dataset>
