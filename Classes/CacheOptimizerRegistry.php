@@ -197,13 +197,28 @@ class CacheOptimizerRegistry implements SingletonInterface {
 	 * Let the registry know that the given table is related
 	 * to the given plugin type.
 	 *
-	 * @param $table
-	 * @param $listType
+	 * @param string $table
+	 * @param string $listType
 	 * @return void
 	 * @api
 	 */
 	public function registerPluginForTable($table, $listType) {
 		$this->pluginTypesByTable[$table][] = $listType;
+	}
+
+	/**
+	 * Let the registry know that the given tables are related
+	 * to the given plugin type.
+	 *
+	 * @param array $tables
+	 * @param string $listType
+	 * @return void
+	 * @api
+	 */
+	public function registerPluginForTables(array $tables, $listType) {
+		foreach ($tables as $table) {
+			$this->registerPluginForTable($table, $listType);
+		}
 	}
 
 	/**
