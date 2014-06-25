@@ -37,8 +37,11 @@ class CacheOptimizerDataHandler extends AbstractCacheOptimizer {
 	 * functionID => is always clear_cache()
 	 * @param \TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler
 	 */
-	public function dataHandlerClearPageCacheEval(array $parameters, /** @noinspection PhpUnusedParameterInspection */
-												  DataHandler $dataHandler) {
+	public function dataHandlerClearPageCacheEval(
+			array $parameters,
+			/** @noinspection PhpUnusedParameterInspection */
+			DataHandler $dataHandler
+	) {
 		$this->initialize();
 
 		$this->cacheOptimizerRegistry->registerPagesWithFlushedCache($parameters['pageIdArray']);
@@ -59,7 +62,7 @@ class CacheOptimizerDataHandler extends AbstractCacheOptimizer {
 	 *
 	 * @param int $pid
 	 */
-	function flushCacheForPage($pid) {
+	protected function flushCacheForPage($pid) {
 		$this->currentPageIdArray[] = (int)$pid;
 	}
 }

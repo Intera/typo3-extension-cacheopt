@@ -39,6 +39,15 @@ class CacheOptimizerRegistry implements SingletonInterface {
 	protected $databaseConnection;
 
 	/**
+	 * Array containing tables that will be skipped during refindex traversal.
+	 *
+	 * @var array
+	 */
+	protected $excludedTables = array(
+		'sys_file_storage' => TRUE,
+	);
+
+	/**
 	 * Array containing UIDs of pages for which the cache has been flushed already.
 	 *
 	 * @var array
@@ -121,6 +130,18 @@ class CacheOptimizerRegistry implements SingletonInterface {
 		} else {
 			return NULL;
 		}
+	}
+
+	/**
+	 * Returns TRUE when the table should not be considered when traversing
+	 * the refindex. Tables that have relations to many records (like
+	 * sys_file_storage) are excluded to prevent memory overflow.
+	 *
+	 * @param string $tableName
+	 * @return bool
+	 */
+	public function isExcludedTable($tableName) {
+		return isset($this->excludedTables[$tableName]);
 	}
 
 	/**

@@ -108,6 +108,10 @@ abstract class AbstractCacheOptimizer {
 			return;
 		}
 
+		if ($this->cacheOptimizerRegistry->isExcludedTable($table)) {
+			return;
+		}
+
 		$this->cacheOptimizerRegistry->registerProcessedRecord($table, $uid);
 
 		$referenceResult = $this->databaseConnection->exec_SELECTquery('tablename,recuid', 'sys_refindex', "ref_table!='_STRING' AND flexpointer='' and softref_key='' AND ref_table=" . $this->databaseConnection->fullQuoteStr($table, 'sys_refindex') . " AND ref_uid=" . (int)$uid, '', '', '', 'hash');
