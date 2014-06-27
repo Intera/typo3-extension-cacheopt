@@ -61,6 +61,8 @@ class CacheOptimizerRegistry implements SingletonInterface {
 	 * @var array
 	 */
 	protected $excludedTables = array(
+		'fe_groups',
+		'fe_users',
 		'sys_file_storage' => TRUE,
 		'sys_language' => TRUE,
 	);
