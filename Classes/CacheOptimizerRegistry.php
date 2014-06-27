@@ -39,12 +39,30 @@ class CacheOptimizerRegistry implements SingletonInterface {
 	protected $databaseConnection;
 
 	/**
+	 * Array containing field names that should be excluded for a given
+	 * table when searching in the refindex. The table is used as array
+	 * key, the fields are stored in an indexed array:
+	 *
+	 * $excludedFieldsForTable = array(
+	 *   'mytable' => array(
+	 *     'myfield1',
+	 *     'myfield2'
+	 *   )
+	 * );
+	 *
+	 *
+	 * @var array
+	 */
+	protected $excludedFieldsForTable = array();
+
+	/**
 	 * Array containing tables that will be skipped during refindex traversal.
 	 *
 	 * @var array
 	 */
 	protected $excludedTables = array(
 		'sys_file_storage' => TRUE,
+		'sys_language' => TRUE,
 	);
 
 	/**
@@ -103,6 +121,21 @@ class CacheOptimizerRegistry implements SingletonInterface {
 	public function getContentTypesForTable($table) {
 		if (isset($this->contentTypesByTable[$table])) {
 			return $this->contentTypesByTable[$table];
+		} else {
+			return NULL;
+		}
+	}
+
+	/**
+	 * Returns an array of field names that should be excluded when searching
+	 * in the refindex or NULL if no fields should be excluded.
+	 *
+	 * @param string $table
+	 * @return array
+	 */
+	public function getExcludedFieldsForTable($table) {
+		if (isset($this->excludedFieldsForTable[$table])) {
+			return $this->excludedFieldsForTable[$table];
 		} else {
 			return NULL;
 		}
@@ -191,6 +224,18 @@ class CacheOptimizerRegistry implements SingletonInterface {
 	 */
 	public function registerContentForTable($table, $contentType) {
 		$this->contentTypesByTable[$table][] = $contentType;
+	}
+
+	/**
+	 * Registers the given field to be excluded when searching in the
+	 * refindex for records of the given table.
+	 *
+	 * @param string $table
+	 * @param string $field
+	 * @return void
+	 */
+	public function registerExcludedFieldForTable($table, $field) {
+		$this->excludedFieldsForTable[$table][] = $field;
 	}
 
 	/**

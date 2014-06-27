@@ -114,12 +114,28 @@ abstract class AbstractCacheOptimizer {
 
 		$this->cacheOptimizerRegistry->registerProcessedRecord($table, $uid);
 
-		$referenceResult = $this->databaseConnection->exec_SELECTquery('tablename,recuid', 'sys_refindex', "ref_table!='_STRING' AND flexpointer='' and softref_key='' AND ref_table=" . $this->databaseConnection->fullQuoteStr($table, 'sys_refindex') . " AND ref_uid=" . (int)$uid, '', '', '', 'hash');
+		$referenceResult = $this->databaseConnection->exec_SELECTquery(
+			'tablename,recuid',
+			'sys_refindex',
+			"ref_table!='_STRING' AND flexpointer='' and softref_key=''" .
+			' AND ref_table=' . $this->databaseConnection->fullQuoteStr($table, 'sys_refindex') .
+			' AND ref_uid=' . (int)$uid, '', '', '', 'hash');
 		while ($referenceRow = $this->databaseConnection->sql_fetch_assoc($referenceResult)) {
 			$this->registerSingleRecordRecursiveForCacheFlush($referenceRow['tablename'], (int)$referenceRow['recuid'], $depth);
 		}
 
-		$referenceResult = $this->databaseConnection->exec_SELECTquery('ref_table,ref_uid', 'sys_refindex', "ref_table!='_STRING' AND flexpointer='' and softref_key='' AND tablename=" . $this->databaseConnection->fullQuoteStr($table, 'sys_refindex') . " AND recuid=" . (int)$uid, '', '', '', 'hash');
+		$fieldWhereQuery = '';
+		$excludedFields = $this->cacheOptimizerRegistry->getExcludedFieldsForTable($table);
+		if (isset($excludedFields)) {
+			$fieldWhereQuery = ' AND field NOT IN (' .
+				implode(',', $this->databaseConnection->fullQuoteArray($excludedFields, 'sys_refindex')) .
+				')';
+		}
+		$referenceIndexWhere = "ref_table!='_STRING' AND flexpointer='' and softref_key=''" .
+			' AND tablename=' . $this->databaseConnection->fullQuoteStr($table, 'sys_refindex') .
+			' AND recuid=' . (int)$uid .
+			$fieldWhereQuery;
+		$referenceResult = $this->databaseConnection->exec_SELECTquery('ref_table,ref_uid', 'sys_refindex', $referenceIndexWhere, '', '', '', 'hash');
 		while ($referenceRow = $this->databaseConnection->sql_fetch_assoc($referenceResult)) {
 			$this->registerSingleRecordRecursiveForCacheFlush($referenceRow['ref_table'], (int)$referenceRow['ref_uid'], $depth);
 		}
@@ -231,6 +247,10 @@ abstract class AbstractCacheOptimizer {
 	protected function registerSingleRecordRecursiveForCacheFlush($referencedTable, $referencedUid, $depth) {
 
 		if ($depth > self::MAX_RECURSE_DEPTH) {
+			return;
+		}
+
+		if ($this->cacheOptimizerRegistry->isExcludedTable($referencedTable)) {
 			return;
 		}
 
