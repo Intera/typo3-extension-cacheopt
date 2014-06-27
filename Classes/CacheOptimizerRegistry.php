@@ -241,6 +241,16 @@ class CacheOptimizerRegistry implements SingletonInterface {
 	}
 
 	/**
+	 * Excludes the given table from refindex traversal.
+	 *
+	 * @param string $table
+	 * @return void
+	 */
+	public function registerExcludedTable($table) {
+		$this->excludedTables[$table] = TRUE;
+	}
+
+	/**
 	 * The cache for the page with the given ID was flushed.
 	 *
 	 * @param int $pid
