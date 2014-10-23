@@ -21,10 +21,23 @@
 		<cruser_id>1</cruser_id>
 		<sorting>256</sorting>
 		<CType>uploads</CType>
-		<header>directory</header>
+		<header>referencing_directory</header>
 		<colPos>0</colPos>
 		<sectionIndex>1</sectionIndex>
 		<file_collections>1</file_collections>
+	</tt_content>
+	<tt_content>
+		<uid>900</uid>
+		<pid>1310</pid>
+		<tstamp>1401292087</tstamp>
+		<crdate>1401292031</crdate>
+		<cruser_id>1</cruser_id>
+		<sorting>256</sorting>
+		<CType>shortcut</CType>
+		<header>referencing_content_referencing_directory</header>
+		<records>90</records>
+		<colPos>0</colPos>
+		<sectionIndex>1</sectionIndex>
 	</tt_content>
 	<tt_content>
 		<uid>91</uid>

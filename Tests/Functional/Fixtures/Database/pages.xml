@@ -42,6 +42,16 @@
 		<doktype>1</doktype>
 	</pages>
 	<pages>
+		<uid>1310</uid>
+		<pid>128</pid>
+		<crdate>1401291975</crdate>
+		<tstamp>1401291975</tstamp>
+		<cruser_id>1</cruser_id>
+		<title>page_referencing_content_referencing_directory</title>
+		<sorting>768</sorting>
+		<doktype>1</doktype>
+	</pages>
+	<pages>
 		<uid>132</uid>
 		<pid>128</pid>
 		<crdate>1401291975</crdate>

@@ -24,6 +24,8 @@ class CacheOptimizerFilesTest extends AbstractCacheOptimizerTest {
 
 	const RESOURCE_STORAGE_UID = 1;
 
+	const PAGE_UID_REFERENCING_CONTENT_REFERENCING_DIRECTORY = 1310;
+
 	/**
 	 * @var \Tx\Cacheopt\CacheOptimizerFiles
 	 */
@@ -61,6 +63,7 @@ class CacheOptimizerFilesTest extends AbstractCacheOptimizerTest {
 	public function fileChangeClearsCacheForPagesReferencingToTheDirectory() {
 
 		$this->fillPageCache(self::PAGE_UID_REFERENCED_DIRECTORY);
+		$this->fillPageCache(self::PAGE_UID_REFERENCING_CONTENT_REFERENCING_DIRECTORY);
 
 		$fileValues = array(
 			'editfile' => array(
@@ -73,6 +76,7 @@ class CacheOptimizerFilesTest extends AbstractCacheOptimizerTest {
 
 		$this->processFileArrayAndFlushCache($fileValues);
 		$this->assertPageCacheIsEmpty(self::PAGE_UID_REFERENCED_DIRECTORY);
+		$this->assertPageCacheIsEmpty(self::PAGE_UID_REFERENCING_CONTENT_REFERENCING_DIRECTORY);
 	}
 
 	/**
