@@ -89,7 +89,10 @@ abstract class AbstractCacheOptimizer {
 		$this->cacheOptimizerRegistry->registerProcessedFolder($storageUid, $folderIdentifier);
 		$fileCollectionResult = $this->databaseConnection->exec_SELECTquery('uid', 'sys_file_collection', "deleted=0 AND type='folder' AND storage=" . (int)$storageUid . " AND folder=" . $this->databaseConnection->fullQuoteStr($folderIdentifier, 'sys_file_collection'));
 		while ($fileCollectionRow = $this->databaseConnection->sql_fetch_assoc($fileCollectionResult)) {
-			$this->flushRelatedCacheForRecord('sys_file_collection', (int)$fileCollectionRow['uid'], self::MAX_RECURSE_DEPTH);
+			// From the file collection records we want to dig down two levels. This will
+			// include content elements referencing the file collection and record elements
+			// pointing to these content elements.
+			$this->flushRelatedCacheForRecord('sys_file_collection', (int)$fileCollectionRow['uid'], self::MAX_RECURSE_DEPTH - 1);
 		}
 	}
 
