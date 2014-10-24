@@ -233,6 +233,19 @@ class CacheOptimizerRegistry implements SingletonInterface {
 	}
 
 	/**
+	 * Let the registry know that the given tables are related to the given content type.
+	 * All tables are automatically excluded from refindex traversal.
+	 *
+	 * @param array $tables
+	 * @param string $contentType
+	 */
+	public function registerContentForTables(array $tables, $contentType) {
+		foreach ($tables as $table) {
+			$this->registerContentForTable($table, $contentType);
+		}
+	}
+
+	/**
 	 * Registers the given field to be excluded when searching in the refindex for records of the given table.
 	 *
 	 * @param string $table
