@@ -111,11 +111,13 @@ abstract class AbstractCacheOptimizer {
 			return;
 		}
 
+		$this->cacheOptimizerRegistry->registerProcessedRecord($table, $uid);
+
+		$this->registerRelatedPluginPagesForCacheFlush($table);
+
 		if ($this->cacheOptimizerRegistry->isExcludedTable($table)) {
 			return;
 		}
-
-		$this->cacheOptimizerRegistry->registerProcessedRecord($table, $uid);
 
 		$referenceResult = $this->databaseConnection->exec_SELECTquery(
 			'tablename,recuid',
@@ -142,8 +144,6 @@ abstract class AbstractCacheOptimizer {
 		while ($referenceRow = $this->databaseConnection->sql_fetch_assoc($referenceResult)) {
 			$this->registerSingleRecordRecursiveForCacheFlush($referenceRow['ref_table'], (int)$referenceRow['ref_uid'], $depth);
 		}
-
-		$this->registerRelatedPluginPagesForCacheFlush($table);
 	}
 
 	/**
