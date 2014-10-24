@@ -3,7 +3,7 @@
 /***************************************************************
  * Extension Manager/Repository config file for ext "cacheopt".
  *
- * Auto generated 24-10-2014 13:25
+ * Auto generated 24-10-2014 13:53
  *
  * Manual updates:
  * Only the data in the array - everything else is removed by next
@@ -14,7 +14,7 @@ $EM_CONF[$_EXTKEY] = array (
 	'title' => 'Cache optimizer',
 	'description' => 'Optimizes automatic cache clearing.',
 	'category' => 'be',
-	'version' => '1.0.1',
+	'version' => '1.0.2',
 	'state' => 'stable',
 	'uploadfolder' => false,
 	'createDirs' => '',
@@ -26,6 +26,7 @@ $EM_CONF[$_EXTKEY] = array (
 	array (
 		'depends' => 
 		array (
+			'typo3' => '6.2.1-6.2.99',
 		),
 		'conflicts' => 
 		array (
