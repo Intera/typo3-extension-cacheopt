@@ -216,21 +216,24 @@ class CacheOptimizerRegistry implements SingletonInterface {
 	}
 
 	/**
-	 * Let the registry know that the given table is related
-	 * to the given content type.
+	 * Let the registry know that the given table is related to the given content type.
 	 *
-	 * @param string $table
-	 * @param string $contentType
+	 *
+	 * @param string $table The name of the table.
+	 * @param string $contentType The value in the CType column.
+	 * @param bool $excludeTable If TRUE the table will excluded from refindex traversal.
 	 * @return void
 	 * @api
 	 */
-	public function registerContentForTable($table, $contentType) {
+	public function registerContentForTable($table, $contentType, $excludeTable = TRUE) {
 		$this->contentTypesByTable[$table][] = $contentType;
+		if ($excludeTable) {
+			$this->registerExcludedTable($table);
+		}
 	}
 
 	/**
-	 * Registers the given field to be excluded when searching in the
-	 * refindex for records of the given table.
+	 * Registers the given field to be excluded when searching in the refindex for records of the given table.
 	 *
 	 * @param string $table
 	 * @param string $field
@@ -272,21 +275,25 @@ class CacheOptimizerRegistry implements SingletonInterface {
 	}
 
 	/**
-	 * Let the registry know that the given table is related
-	 * to the given plugin type.
+	 * Let the registry know that the given table is related to the given plugin type.
 	 *
-	 * @param string $table
-	 * @param string $listType
+	 * @param string $table The name of the table.
+	 * @param string $listType The value in the list_type column.
+	 * @param bool $excludeTable If TRUE the table will excluded from refindex traversal.
+	 * Since this makes sense in most cases TRUE is the default value.
 	 * @return void
 	 * @api
 	 */
-	public function registerPluginForTable($table, $listType) {
+	public function registerPluginForTable($table, $listType, $excludeTable = TRUE) {
 		$this->pluginTypesByTable[$table][] = $listType;
+		if ($excludeTable) {
+			$this->registerExcludedTable($table);
+		}
 	}
 
 	/**
-	 * Let the registry know that the given tables are related
-	 * to the given plugin type.
+	 * Let the registry know that the given tables are related to the given plugin type.
+	 * All tables are automatically excluded from refindex traversal.
 	 *
 	 * @param array $tables
 	 * @param string $listType
