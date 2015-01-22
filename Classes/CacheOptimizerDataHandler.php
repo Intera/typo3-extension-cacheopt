@@ -44,6 +44,10 @@ class CacheOptimizerDataHandler extends AbstractCacheOptimizer {
 	) {
 		$this->initialize();
 
+		if ($parameters['functionID'] !== 'clear_cache()')  {
+			return;
+		}
+
 		$this->cacheOptimizerRegistry->registerPagesWithFlushedCache($parameters['pageIdArray']);
 
 		$table = $parameters['table'];
