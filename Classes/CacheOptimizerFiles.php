@@ -11,10 +11,10 @@ namespace Tx\Cacheopt;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\Folder;
+use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This cache optimizer hooks into the ResourceStorage and clears the cache
@@ -23,9 +23,10 @@ use TYPO3\CMS\Core\Resource\Folder;
 class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInterface {
 
 	/**
-	 * @var \TYPO3\CMS\Core\Cache\CacheManager
+	 *
+	 * @var CacheApi
 	 */
-	protected $cacheManager;
+	protected $cacheApi;
 
 	/**
 	 * Array containing all page UIDs for which the cache should be cleared.
@@ -33,19 +34,6 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 	 * @var array
 	 */
 	protected $flushCachePids = array();
-
-	/**
-	 * Clears the cache for all registered page UIDs.
-
-	 * @return void
-	 */
-	protected function flushCacheForAllRegisteredPages() {
-		$flushCachePids = array_unique($this->flushCachePids);
-		$this->flushCachePids = array();
-		foreach ($flushCachePids as $pageId) {
-			$this->cacheManager->flushCachesInGroupByTag('pages', 'pageId_' . $pageId);
-		}
-	}
 
 	/**
 	 * Will be called after a file is added to a directory and flushes
@@ -180,6 +168,19 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 	}
 
 	/**
+	 * Clears the cache for all registered page UIDs.
+	 *
+	 * @return void
+	 */
+	protected function flushCacheForAllRegisteredPages() {
+		$flushCachePids = array_unique($this->flushCachePids);
+		$this->flushCachePids = array();
+		foreach ($flushCachePids as $pageId) {
+			$this->cacheApi->flushCacheForPage($pageId, FALSE);
+		}
+	}
+
+	/**
 	 * Registers the given page UID in the array of pages for which the
 	 * cache should be flushed at the end.
 	 *
@@ -201,6 +202,6 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 		}
 		parent::initialize();
 		$this->resourceFactory = \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance();
-		$this->cacheManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager');
+		$this->cacheApi = GeneralUtility::makeInstance('Tx\\Cacheopt\\CacheApi');
 	}
 }
