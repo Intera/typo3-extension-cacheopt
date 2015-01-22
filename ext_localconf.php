@@ -4,7 +4,20 @@ if (!defined('TYPO3_MODE')) {
 }
 
 // Hook into the data handler to clear the cache for related records.
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['clearPageCacheEval'][] = 'Tx\\Cacheopt\\CacheOptimizerDataHandler->dataHandlerClearPageCacheEval';
+// Make sure we are the first processor so that other processors handle the pages we added.
+if (
+	isset($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['clearPageCacheEval'])
+	&& is_array($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['clearPageCacheEval'])
+) {
+	array_unshift(
+		$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['clearPageCacheEval'],
+		'Tx\\Cacheopt\\CacheOptimizerDataHandler->dataHandlerClearPageCacheEval');
+
+} else {
+
+	$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['clearPageCacheEval'][] =
+		'Tx\\Cacheopt\\CacheOptimizerDataHandler->dataHandlerClearPageCacheEval';
+}
 
 // Hook into the file handling to clear the cache for related records.
 /** @var \TYPO3\CMS\Extbase\SignalSlot\Dispatcher $signalSlotDispatcher */
