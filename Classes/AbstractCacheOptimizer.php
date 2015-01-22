@@ -47,34 +47,6 @@ abstract class AbstractCacheOptimizer {
 	abstract protected function flushCacheForPage($pid);
 
 	/**
-	 * Builds a where statement that selects all tt_content elements that
-	 * have a content type or a plugin type that is related to the given table.
-	 *
-	 * @param string $table
-	 * @return string
-	 */
-	public function getTtContentWhereStatementForTable($table) {
-		$this->initialize();
-		$whereStatement = '';
-
-		$contentTypesForTable = $this->cacheOptimizerRegistry->getContentTypesForTable($table);
-		if (isset($contentTypesForTable)) {
-			$whereStatement .= ' OR (tt_content.CType IN (' . implode(',', $this->databaseConnection->fullQuoteArray($contentTypesForTable, 'tt_content')) . '))';
-		}
-
-		$pluginTypesForTable = $this->cacheOptimizerRegistry->getPluginTypesForTable($table);
-		if (isset($pluginTypesForTable)) {
-			$whereStatement .= ' OR (tt_content.CType=\'list\' AND tt_content.list_type IN (' . implode(',', $this->databaseConnection->fullQuoteArray($pluginTypesForTable, 'tt_content')) . '))';
-		}
-
-		if ($whereStatement !== '') {
-			$whereStatement = ' AND ( (1=2) ' . $whereStatement . ')';
-		}
-
-		return $whereStatement;
-	}
-
-	/**
 	 * Searches for all records pointing to the given folder and flushes
 	 * the related page caches.
 	 *
@@ -162,6 +134,34 @@ abstract class AbstractCacheOptimizer {
 		} else {
 			return '';
 		}
+	}
+
+	/**
+	 * Builds a where statement that selects all tt_content elements that
+	 * have a content type or a plugin type that is related to the given table.
+	 *
+	 * @param string $table
+	 * @return string
+	 */
+	protected function getTtContentWhereStatementForTable($table) {
+		$this->initialize();
+		$whereStatement = '';
+
+		$contentTypesForTable = $this->cacheOptimizerRegistry->getContentTypesForTable($table);
+		if (isset($contentTypesForTable)) {
+			$whereStatement .= ' OR (tt_content.CType IN (' . implode(',', $this->databaseConnection->fullQuoteArray($contentTypesForTable, 'tt_content')) . '))';
+		}
+
+		$pluginTypesForTable = $this->cacheOptimizerRegistry->getPluginTypesForTable($table);
+		if (isset($pluginTypesForTable)) {
+			$whereStatement .= ' OR (tt_content.CType=\'list\' AND tt_content.list_type IN (' . implode(',', $this->databaseConnection->fullQuoteArray($pluginTypesForTable, 'tt_content')) . '))';
+		}
+
+		if ($whereStatement !== '') {
+			$whereStatement = ' AND ( (1=2) ' . $whereStatement . ')';
+		}
+
+		return $whereStatement;
 	}
 
 	/**
