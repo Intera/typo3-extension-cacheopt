@@ -11,6 +11,7 @@ namespace Tx\Cacheopt;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -39,7 +40,7 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 	 * Will be called after a file is added to a directory and flushes
 	 * all caches related to this directory.
 	 *
-	 * @param FileInterface $file
+	 * @param FileInterface|File $file
 	 * @param Folder $targetFolder
 	 * @return void
 	 */
@@ -50,6 +51,9 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 	) {
 		$this->initialize();
 		$this->flushCacheForRelatedFolders($targetFolder->getStorage()->getUid(), $targetFolder->getIdentifier());
+		if ($file instanceof \TYPO3\CMS\Core\Resource\File) {
+			$this->flushRelatedCacheForRecord('sys_file', $file->getUid());
+		}
 		$this->flushCacheForAllRegisteredPages();
 	}
 

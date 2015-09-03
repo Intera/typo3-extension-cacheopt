@@ -11,6 +11,9 @@ namespace Tx\Cacheopt\Tests\Functional;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Cacheopt\Tests\Functional\Mocks\ResourceStorageMock;
+use TYPO3\CMS\Core\Resource\ResourceStorage;
+
 require_once(dirname(__FILE__) . '/AbstractCacheOptimizerTest.php');
 
 /**
@@ -22,9 +25,9 @@ class CacheOptimizerFilesTest extends AbstractCacheOptimizerTest {
 
 	const FILE_IDENTIFIER_REFERENCED_IN_DIRECTORY = '/testdirectory_referenced/file_in_referenced_dir.txt';
 
-	const RESOURCE_STORAGE_UID = 1;
-
 	const PAGE_UID_REFERENCING_CONTENT_REFERENCING_DIRECTORY = 1310;
+
+	const RESOURCE_STORAGE_UID = 1;
 
 	/**
 	 * @var \Tx\Cacheopt\CacheOptimizerFiles
@@ -94,6 +97,39 @@ class CacheOptimizerFilesTest extends AbstractCacheOptimizerTest {
 				array(
 					'data' => 'testcontent_modified',
 					'target' => $this->getRootFolderIdentifier() . ltrim(self::FILE_IDENTIFIER_REFERENCED, '/')
+				)
+			),
+		);
+
+		$this->processFileArrayAndFlushCache($fileValues);
+		$this->assertPageCacheIsEmpty(self::PAGE_UID_REFERENCED_FILE);
+	}
+
+	/**
+	 * If a sys_file record that is referenced by a page is overwritten by an upload
+	 * the cache of the page referencing the file should be cleared.
+	 *
+	 * @test
+	 */
+	public function fileUploadClearsCacheOfPageWhereOverwrittenFileIsReferenced() {
+
+		$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][ResourceStorage::class]['className'] = ResourceStorageMock::class;
+
+		$this->fillPageCache(self::PAGE_UID_REFERENCED_FILE);
+
+		$uploadPosition = 'file1';
+		$_FILES['upload_' . $uploadPosition] = array(
+			'name' => basename(self::FILE_IDENTIFIER_REFERENCED),
+			'type' => 'text/plain',
+			'tmp_name' => PATH_site . 'typo3temp/uploadfiles/testfile_referenced.txt',
+			'size' => 31
+		);
+
+		$fileValues = array(
+			'upload' => array(
+				array(
+					'data' => $uploadPosition,
+					'target' => $this->getRootFolderIdentifier() . ltrim(dirname(self::FILE_IDENTIFIER_REFERENCED), '/')
 				)
 			),
 		);

@@ -30,6 +30,7 @@ abstract class AbstractCacheOptimizerTest extends \TYPO3\CMS\Core\Tests\Function
 	protected $additionalFoldersToCreate = array(
 		'/fileadmin/testdirectory',
 		'/fileadmin/testdirectory_referenced',
+		'/typo3temp/uploadfiles',
 	);
 
 	/**
@@ -48,6 +49,7 @@ abstract class AbstractCacheOptimizerTest extends \TYPO3\CMS\Core\Tests\Function
 		'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Files/fileadmin/testdirectory/testfile.txt' => 'fileadmin/testdirectory/testfile.txt',
 		'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Files/fileadmin/testdirectory/testfile_referenced.txt' => 'fileadmin/testdirectory/testfile_referenced.txt',
 		'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Files/fileadmin/testdirectory_referenced/file_in_referenced_dir.txt' => 'fileadmin/testdirectory_referenced/file_in_referenced_dir.txt',
+		'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Files/typo3temp/uploadfiles/testfile_referenced.txt' => 'typo3temp/uploadfiles/testfile_referenced.txt',
 	);
 
 	/**
@@ -80,6 +82,8 @@ abstract class AbstractCacheOptimizerTest extends \TYPO3\CMS\Core\Tests\Function
 		$this->coreExtensionsToLoad[] = 'css_styled_content';
 
 		parent::setUp();
+
+		unset($GLOBALS['TYPO3_CONF_VARS']['LOG']);
 
 		$this->loadDatabaseFixtures();
 		$this->copyFilesToTestInstance();
