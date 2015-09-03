@@ -6,5 +6,10 @@
 		"psr-4": {
 			"Tx\\Cacheopt\\": "Classes/"
 		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Tx\\Cacheopt\\Tests\\": "Tests/"
+		}
 	}
 }
