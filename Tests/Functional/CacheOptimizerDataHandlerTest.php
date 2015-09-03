@@ -11,12 +11,12 @@ namespace Tx\Cacheopt\Tests\Functional;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-require_once(dirname(__FILE__) . '/AbstractCacheOptimizerTest.php');
+require_once(dirname(__FILE__) . '/CacheOptimizerTestAbstract.php');
 
 /**
  * Functional tests for the data handler cache optimizer.
  */
-class CacheOptimizerTest extends AbstractCacheOptimizerTest {
+class CacheOptimizerTest extends CacheOptimizerTestAbstract {
 
 	const CACHEOPT_RECORD_UID = 1;
 

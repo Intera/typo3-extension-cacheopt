@@ -11,12 +11,12 @@ namespace Tx\Cacheopt\Tests\Functional;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-require_once(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . '/typo3/sysext/core/Tests/Functional/DataHandling/AbstractDataHandlerActionTestCase.php');
+use TYPO3\CMS\Core\Tests\Functional\DataHandling\AbstractDataHandlerActionTestCase;
 
 /**
  * Base class for all functional tests of the cache optimizer.
  */
-abstract class AbstractCacheOptimizerTest extends \TYPO3\CMS\Core\Tests\Functional\DataHandling\AbstractDataHandlerActionTestCase {
+abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestCase {
 
 	const PAGE_UID_REFERENCED_DIRECTORY = 131;
 

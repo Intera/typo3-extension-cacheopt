@@ -14,12 +14,12 @@ namespace Tx\Cacheopt\Tests\Functional;
 use Tx\Cacheopt\Tests\Functional\Mocks\ResourceStorageMock;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 
-require_once(dirname(__FILE__) . '/AbstractCacheOptimizerTest.php');
+require_once(dirname(__FILE__) . '/CacheOptimizerTestAbstract.php');
 
 /**
  * Functional test for the files cache optimizer.
  */
-class CacheOptimizerFilesTest extends AbstractCacheOptimizerTest {
+class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract {
 
 	const FILE_IDENTIFIER_REFERENCED = '/testdirectory/testfile_referenced.txt';
 
