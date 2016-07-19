@@ -12,6 +12,7 @@ namespace Tx\Cacheopt\Tests\Functional\Mocks;
  *                                                                        */
 
 use TYPO3\CMS\Core\Resource\ResourceStorage;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This mock adjusts the behavior of the default resource storage.
@@ -28,6 +29,11 @@ class ResourceStorageMock extends ResourceStorage {
 	 * @return void
 	 */
 	protected function assureFileUploadPermissions($localFilePath, $targetFolder, $targetFileName, $uploadedFileSize) {
-		$this->assureFileAddPermissions('', $targetFolder, $targetFileName);
+		if (GeneralUtility::compat_version('7.0')) {
+			$this->assureFileAddPermissions($targetFolder, $targetFileName);
+		} else {
+			// In TYPO3 6.2 we the method requires three parameters.
+			$this->assureFileAddPermissions('', $targetFolder, $targetFileName);
+		}
 	}
 }
