@@ -17,8 +17,8 @@ matrix:
       env: TYPO3_VERSION=^8
     - php: 7
       env: TYPO3_VERSION=dev-master
-    allow_failures:
-      - env: TYPO3_VERSION=dev-master
+  allow_failures:
+    - env: TYPO3_VERSION=dev-master
 
 cache:
   directories:
