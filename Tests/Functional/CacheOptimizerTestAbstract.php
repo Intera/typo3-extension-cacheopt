@@ -108,7 +108,7 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
 	 */
 	protected function assertPageCacheIsFilled($pageUid) {
 		$cacheEntries = $this->getDatabaseConnection()->exec_SELECTgetRows('id', 'cf_cache_pages_tags', 'tag=\'pageId_' . $pageUid . '\'');
-		$this->assertEquals(1, count($cacheEntries), 'Page cache for page ' . $pageUid . ' is not filled.');
+		$this->assertGreaterThanOrEqual(1, count($cacheEntries), 'Page cache for page ' . $pageUid . ' is not filled.');
 	}
 
 	/**
