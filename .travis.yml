@@ -59,4 +59,4 @@ script:
     export typo3DatabaseHost="localhost";
     export typo3DatabaseUsername="root";
     export typo3DatabasePassword="";
-    find . -wholename '*Tests/Functional/*Test.php' | parallel --gnu 'echo; echo "Running functional test suite {}"; ./bin/phpunit --colors -c .Build/Web/typo3/sysext/core/Build/FunctionalTests.xml {}'
+    find Tests -wholename '*Tests/Functional/*Test.php' | parallel --gnu 'echo; echo "Running functional test suite {}"; ./.Build/bin/phpunit --colors -c .Build/Web/typo3/sysext/core/Build/FunctionalTests.xml {}'
