@@ -1,15 +1,28 @@
 language: php
+sudo: false
 
 matrix:
-  fast_finish: true
-
   include:
     - php: 5.5
-      env: TYPO3_BRANCH="TYPO3_6-2"
+      env: TYPO3_VERSION=^6.2
     - php: 5.6
-      env: TYPO3_BRANCH="TYPO3_6-2"
+      env: TYPO3_VERSION=^6.2
+    - php: 5.5
+      env: TYPO3_VERSION=^7.6
+    - php: 5.6
+      env: TYPO3_VERSION=^7.6
+    - php: 7
+      env: TYPO3_VERSION=^7.6
+    - php: 7
+      env: TYPO3_VERSION=^8
+    - php: 7
+      env: TYPO3_VERSION=dev-master
+    allow_failures:
+      - env: TYPO3_VERSION=dev-master
 
-sudo: false
+cache:
+  directories:
+    - $HOME/.composer/cache
 
 addons:
   apt:
@@ -20,14 +33,24 @@ cache:
   directories:
     - $HOME/.composer/cache
 
-before_script:
-  - cd ..
-  - git clone --single-branch --branch $TYPO3_BRANCH --depth 1 https://github.com/TYPO3/TYPO3.CMS.git typo3_core
-  - mv typo3_core/* .
+before_install:
+  - phpenv config-rm xdebug.ini
   - composer self-update
-  - composer install
-  - mkdir -p uploads typo3temp typo3conf/ext
-  - mv typo3-extension-cacheopt typo3conf/ext/cacheopt
+  - composer --version
+
+before_script:
+  # First we install all required packages as dist versions.
+  - composer require typo3/cms=$TYPO3_VERSION --prefer-dist
+  # Now remove the TYPO3 core and all related symlinks.
+  - rm .Build/vendor/typo3/cms -Rf
+  - rm -f .Build/Web/typo3
+  - rm -f .Build/Web/index.php
+  # Finally we install the TYPO3 core as source version because we need some functional
+  # test classes that are not included in the dist versions.
+  - composer require typo3/cms=$TYPO3_VERSION --prefer-source
+  - export TYPO3_PATH_WEB="$PWD/.Build/Web"
+  - mkdir -p $TYPO3_PATH_WEB/typo3conf/ext
+  - ln -s $PWD $TYPO3_PATH_WEB/typo3conf/ext/cacheopt
 
 script:
   - >
@@ -36,4 +59,4 @@ script:
     export typo3DatabaseHost="localhost";
     export typo3DatabaseUsername="root";
     export typo3DatabasePassword="";
-    find . -wholename '*typo3conf/ext/cacheopt/Tests/Functional/*Test.php' | parallel --gnu 'echo; echo "Running functional test suite {}"; ./bin/phpunit --colors -c typo3/sysext/core/Build/FunctionalTests.xml {}'
+    find . -wholename '*Tests/Functional/*Test.php' | parallel --gnu 'echo; echo "Running functional test suite {}"; ./bin/phpunit --colors -c .Build/Web/typo3/sysext/core/Build/FunctionalTests.xml {}'
