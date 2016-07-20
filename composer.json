@@ -17,7 +17,8 @@
     },
     "require-dev": {
         "namelesscoder/typo3-repository-client": "1.1.x-dev",
-        "phpunit/phpunit": "~4.8.0"
+        "phpunit/phpunit": "~4.8.0",
+        "typo3-ter/gridelements": "*"
     },
     "autoload": {
         "psr-4": {
@@ -44,5 +45,11 @@
             "cms-package-dir": "{$vendor-dir}/typo3/cms",
             "web-dir": ".Build/Web"
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://composer.typo3.org"
+        }
+    ]
 }

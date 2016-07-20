@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset>
+	<sys_template>
+		<uid>2</uid>
+		<pid>200</pid>
+		<tstamp>1401434980</tstamp>
+		<crdate>1401434943</crdate>
+		<cruser_id>1</cruser_id>
+		<title>gridelement_root</title>
+		<root>0</root>
+		<clear>0</clear>
+		<include_static_file>EXT:gridelements/Configuration/TypoScript/</include_static_file>
+		<config/>
+		<constants/>
+	</sys_template>
+</dataset>

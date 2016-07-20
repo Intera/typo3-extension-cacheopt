@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset>
+	<pages>
+		<uid>200</uid>
+		<pid>128</pid>
+		<crdate>1401290268</crdate>
+		<tstamp>1401290272</tstamp>
+		<cruser_id>1</cruser_id>
+		<title>gridelement_test_root</title>
+		<sorting>256</sorting>
+		<doktype>1</doktype>
+		<TSconfig>
+tx_gridelements.setup.2ColumnGrid {
+	title = 2 column grid
+	description = A grid element with two columns with identical width.
+	topLevelLayout = 1
+	config {
+		colCount = 2
+		rowCount = 1
+		rows {
+			1 {
+				columns {
+					1 {
+						name = Left
+						colPos = 0
+					}
+					2 {
+						name = Right
+						colPos = 1
+					}
+				}
+			}
+		}
+	}
+}
+
+
+mod.web_layout.BackendLayouts {
+
+	Content {
+		title = Content
+		config.backend_layout {
+			colCount = 1
+			rowCount = 1
+			rows {
+				1 {
+					columns {
+						1 {
+							name = Standard
+							rowspan = 1
+							colPos = 0
+						}
+					}
+				}
+			}
+		}
+	}
+}
+		</TSconfig>
+	</pages>
+	<pages>
+		<uid>210</uid>
+		<pid>200</pid>
+		<crdate>1401291877</crdate>
+		<tstamp>1401291979</tstamp>
+		<cruser_id>1</cruser_id>
+		<title>gridelement_tree_1</title>
+		<sorting>256</sorting>
+		<doktype>1</doktype>
+	</pages>
+	<pages>
+		<uid>220</uid>
+		<pid>200</pid>
+		<crdate>1401291975</crdate>
+		<tstamp>1401291975</tstamp>
+		<cruser_id>1</cruser_id>
+		<title>gridelement_tree_2</title>
+		<sorting>512</sorting>
+		<doktype>1</doktype>
+	</pages>
+	<pages>
+		<uid>211</uid>
+		<pid>210</pid>
+		<crdate>1401291975</crdate>
+		<tstamp>1401291975</tstamp>
+		<cruser_id>1</cruser_id>
+		<title>gridelement_tree_1_subpage</title>
+		<sorting>256</sorting>
+		<doktype>1</doktype>
+	</pages>
+	<pages>
+		<uid>221</uid>
+		<pid>220</pid>
+		<crdate>1401291975</crdate>
+		<tstamp>1401291975</tstamp>
+		<cruser_id>1</cruser_id>
+		<title>gridelement_tree_2_subpage</title>
+		<sorting>256</sorting>
+		<doktype>1</doktype>
+	</pages>
+</dataset>
