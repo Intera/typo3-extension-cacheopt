@@ -152,6 +152,22 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 	}
 
 	/**
+	 * Will be called after a file was renamed.
+	 * Flushes the cache for all pages pointing to the file or its parent directory.
+	 *
+	 * @param FileInterface $file
+	 * @param $localFilePath
+	 * @return void
+	 */
+	public function handleFileReplacePost($file, $localFilePath) {
+		$this->initialize();
+		if ($file instanceof \TYPO3\CMS\Core\Resource\File) {
+			$this->flushRelatedCacheForRecord('sys_file', $file->getUid());
+		}
+		$this->flushCacheForAllRegisteredPages();
+	}
+
+	/**
 	 * Will be called after the content was changed in the given file.
 	 * Flushes the cache for all pages pointing to the file or its parent directory.
 	 *

@@ -29,6 +29,7 @@ $signalSlotDispatcher->connect('TYPO3\\CMS\\Core\\Resource\\ResourceStorage', \T
 $signalSlotDispatcher->connect('TYPO3\\CMS\\Core\\Resource\\ResourceStorage', \TYPO3\CMS\Core\Resource\ResourceStorage::SIGNAL_PostFileCopy, 'Tx\\Cacheopt\\CacheOptimizerFiles', 'handleFileCopyPost');
 $signalSlotDispatcher->connect('TYPO3\\CMS\\Core\\Resource\\ResourceStorage', \TYPO3\CMS\Core\Resource\ResourceStorage::SIGNAL_PostFileSetContents, 'Tx\\Cacheopt\\CacheOptimizerFiles', 'handleFileSetContentsPost');
 $signalSlotDispatcher->connect('TYPO3\\CMS\\Core\\Resource\\ResourceStorage', \TYPO3\CMS\Core\Resource\ResourceStorage::SIGNAL_PostFileRename, 'Tx\\Cacheopt\\CacheOptimizerFiles', 'handleFileRenamePost');
+$signalSlotDispatcher->connect('TYPO3\\CMS\\Core\\Resource\\ResourceStorage', \TYPO3\CMS\Core\Resource\ResourceStorage::SIGNAL_PostFileReplace, 'Tx\\Cacheopt\\CacheOptimizerFiles', 'handleFileReplacePost');
 
 $cacheOptimizerRegistry = \Tx\Cacheopt\CacheOptimizerRegistry::getInstance();
 
