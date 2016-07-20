@@ -11,6 +11,8 @@ namespace Tx\Cacheopt\Tests\Functional;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 require_once(dirname(__FILE__) . '/CacheOptimizerTestAbstract.php');
 
 /**
@@ -41,6 +43,11 @@ class CacheOptimizerDataHandlerGridelementsTest extends CacheOptimizerTestAbstra
 	 * @test
 	 */
 	public function contentChangeClearsCacheForRelatedRecordContentsWithinGridelements() {
+
+		if (GeneralUtility::compat_version('8.0')) {
+			$this->markTestSkipped('gridelements is not supporting TYPO3 8.0 yet.');
+		}
+
 		$this->fillPageCache(self::PAGE_UID_REFERENCING_CONTENT);
 		$this->actionService->modifyRecord('tt_content', self::CONTENT_UID_REFERENCED, array('header' => 'referencing_content_mod'));
 		$this->assertPageCacheIsEmpty(self::PAGE_UID_REFERENCING_CONTENT);
