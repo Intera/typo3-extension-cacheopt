@@ -39,6 +39,8 @@ before_install:
   - composer --version
 
 before_script:
+  # Rename our working directory, required for Extension upload to TER.
+  - cd .. && mv typo3-extension-cacheopt cacheopt && cd cacheopt
   # First we install all required packages as dist versions.
   - composer require typo3/cms=$TYPO3_VERSION --prefer-dist
   # Now remove the TYPO3 core and all related symlinks.
