@@ -27,6 +27,7 @@
     "autoload-dev": {
         "psr-4": {
             "Tx\\Cacheopt\\Tests\\": "Tests/",
+            "Tx\\CacheoptTest\\": "Tests/Functional/Fixtures/Extensions/cacheopt_test/Classes/",
             "TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/core/Tests/"
         }
     },
