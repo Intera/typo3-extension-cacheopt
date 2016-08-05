@@ -11,8 +11,6 @@ namespace Tx\Cacheopt\Tests\Functional;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-
 require_once(dirname(__FILE__) . '/CacheOptimizerTestAbstract.php');
 
 /**
@@ -25,13 +23,13 @@ class CacheOptimizerDataHandlerGridelementsTest extends CacheOptimizerTestAbstra
 
     public function setUp() {
 
+        if ($this->isTypo3Version8()) {
+            return;
+        }
+
         $this->testExtensionsToLoad[] = 'typo3conf/ext/gridelements';
 
         parent::setUp();
-
-        if (GeneralUtility::compat_version('8.0')) {
-            return;
-        }
 
         $this->importDataSet(ORIGINAL_ROOT . 'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Database/gridelements/pages.xml');
         $this->importDataSet(ORIGINAL_ROOT . 'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Database/gridelements/sys_template.xml');
@@ -48,12 +46,25 @@ class CacheOptimizerDataHandlerGridelementsTest extends CacheOptimizerTestAbstra
 	 */
 	public function contentChangeClearsCacheForRelatedRecordContentsWithinGridelements() {
 
-		if (GeneralUtility::compat_version('8.0')) {
+		if ($this->isTypo3Version8()) {
 			$this->markTestSkipped('gridelements is not supporting TYPO3 8.0 yet.');
 		}
 
 		$this->fillPageCache(self::PAGE_UID_REFERENCING_CONTENT);
 		$this->actionService->modifyRecord('tt_content', self::CONTENT_UID_REFERENCED, array('header' => 'referencing_content_mod'));
 		$this->assertPageCacheIsEmpty(self::PAGE_UID_REFERENCING_CONTENT);
+	}
+
+	/**
+	 * We check if the current TYPO3 version is 8.x.
+	 *
+	 * We can not use \TYPO3\CMS\Core\Utility\GeneralUtility::compat_version() because we must run
+	 * parent::setUp() before to make it work which will already cause an error when loading
+	 * the gridelements Extension.
+	 */
+	protected function isTypo3Version8()
+	{
+		// We know the ConnectionPool class was introduced in TYPO3 8.x.
+		return class_exists('TYPO3\\CMS\\Core\\Database\\ConnectionPool');
 	}
 }
