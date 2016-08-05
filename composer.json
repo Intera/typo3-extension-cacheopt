@@ -33,8 +33,8 @@
         }
     },
     "replace": {
-        "typo3_console": "self.version",
-        "typo3-ter/typo3-console": "self.version"
+        "cacheopt": "self.version",
+        "typo3-ter/cacheopt": "self.version"
     },
     "config": {
         "vendor-dir": ".Build/vendor",
