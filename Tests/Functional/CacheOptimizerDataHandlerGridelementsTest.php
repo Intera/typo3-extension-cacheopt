@@ -25,13 +25,13 @@ class CacheOptimizerDataHandlerGridelementsTest extends CacheOptimizerTestAbstra
 
     public function setUp() {
 
+        $this->testExtensionsToLoad[] = 'typo3conf/ext/gridelements';
+
         parent::setUp();
 
         if (GeneralUtility::compat_version('8.0')) {
             return;
         }
-
-        $this->testExtensionsToLoad[] = 'typo3conf/ext/gridelements';
 
         $this->importDataSet(ORIGINAL_ROOT . 'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Database/gridelements/pages.xml');
         $this->importDataSet(ORIGINAL_ROOT . 'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Database/gridelements/sys_template.xml');
