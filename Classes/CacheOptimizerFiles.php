@@ -66,7 +66,7 @@ class CacheOptimizerFiles implements SingletonInterface
         $this->initialize();
         $this->flushCacheForRelatedFolders($targetFolder->getStorage()->getUid(), $targetFolder->getIdentifier());
         if ($file instanceof File) {
-            $this->registerFileForCacheFlush($file->getUid());
+            $this->registerFileForCacheFlush($file);
         }
         $this->flushCacheForAllRegisteredTags();
     }
