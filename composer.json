@@ -18,7 +18,9 @@
     "require-dev": {
         "namelesscoder/typo3-repository-client": "^1.2.0",
         "phpunit/phpunit": "~4.8.0",
-        "typo3-ter/gridelements": "*"
+        "typo3-ter/gridelements": "*",
+        "squizlabs/php_codesniffer": "^2.7",
+        "de-swebhosting/php-codestyle": "dev-master"
     },
     "autoload": {
         "psr-4": {
