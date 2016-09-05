@@ -10,30 +10,30 @@
  * writing. "version" and "dependencies" must not be touched!
  ***************************************************************/
 
-$EM_CONF[$_EXTKEY] = array (
-	'title' => 'Cache optimizer',
-	'description' => 'Optimizes automatic cache clearing.',
-	'category' => 'be',
-	'version' => '1.0.2',
-	'state' => 'stable',
-	'uploadfolder' => false,
-	'createDirs' => '',
-	'clearcacheonload' => true,
-	'author' => 'Alexander Stehlik',
-	'author_email' => 'astehlik.deleteme@intera.de',
-	'author_company' => 'Intera GmbH',
-	'constraints' =>
-	array (
-		'depends' =>
-		array (
-			'typo3' => '6.2.1-7.99.99',
-		),
-		'conflicts' =>
-		array (
-		),
-		'suggests' =>
-		array (
-		),
-	),
-);
+$EM_CONF[$_EXTKEY] = [
+    'title' => 'Cache optimizer',
+    'description' => 'Optimizes automatic cache clearing.',
+    'category' => 'be',
+    'version' => '1.0.2',
+    'state' => 'stable',
+    'uploadfolder' => false,
+    'createDirs' => '',
+    'clearcacheonload' => true,
+    'author' => 'Alexander Stehlik',
+    'author_email' => 'astehlik.deleteme@intera.de',
+    'author_company' => 'Intera GmbH',
+    'constraints' =>
+        [
+            'depends' =>
+                [
+                    'typo3' => '6.2.1-7.99.99',
+                ],
+            'conflicts' =>
+                [
+                ],
+            'suggests' =>
+                [
+                ],
+        ],
+];
 

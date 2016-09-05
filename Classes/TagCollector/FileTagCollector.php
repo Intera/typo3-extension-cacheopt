@@ -19,52 +19,54 @@ use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
-class FileTagCollector {
-	/**
-	 * @param ResourceStorage $storage
-	 * @param DriverInterface $driver
-	 * @param FileInterface $resourceObject
-	 * @param $relativeToCurrentScript
-	 * @param array $urlData
-	 */
-	public function collectTagsForPreGeneratePublicUrl(
-		/** @noinspection PhpUnusedParameterInspection */
-		ResourceStorage $storage,
-		DriverInterface $driver,
-		FileInterface $resourceObject,
-		$relativeToCurrentScript,
-		array $urlData
-	) {
-		$tsfe = $this->getTypoScriptFrontendController();
-		if (!$tsfe instanceof TypoScriptFrontendController) {
-			return;
-		}
+class FileTagCollector
+{
+    /**
+     * @param ResourceStorage $storage
+     * @param DriverInterface $driver
+     * @param FileInterface $resourceObject
+     * @param $relativeToCurrentScript
+     * @param array $urlData
+     */
+    public function collectTagsForPreGeneratePublicUrl(
+        /** @noinspection PhpUnusedParameterInspection */
+        ResourceStorage $storage,
+        DriverInterface $driver,
+        FileInterface $resourceObject,
+        $relativeToCurrentScript,
+        array $urlData
+    ) {
+        $tsfe = $this->getTypoScriptFrontendController();
+        if (!$tsfe instanceof TypoScriptFrontendController) {
+            return;
+        }
 
-		$cacheTags = [];
-		$file = NULL;
-		if ($resourceObject instanceof File) {
-			$file = $resourceObject;
-		} elseif ($resourceObject instanceof FileReference) {
-			$file = $resourceObject->getOriginalFile();
-			$cacheTags[] = 'sys_file_reference_' . $resourceObject->getUid();
-		} elseif ($resourceObject instanceof ProcessedFile) {
-			$file = $resourceObject->getOriginalFile();
-			$cacheTags[] = 'sys_file_processedfile_' . $resourceObject->getUid();
-		}
+        $cacheTags = [];
+        $file = null;
+        if ($resourceObject instanceof File) {
+            $file = $resourceObject;
+        } elseif ($resourceObject instanceof FileReference) {
+            $file = $resourceObject->getOriginalFile();
+            $cacheTags[] = 'sys_file_reference_' . $resourceObject->getUid();
+        } elseif ($resourceObject instanceof ProcessedFile) {
+            $file = $resourceObject->getOriginalFile();
+            $cacheTags[] = 'sys_file_processedfile_' . $resourceObject->getUid();
+        }
 
-		if ($file instanceof File) {
-			$cacheTags[] = 'sys_file_' . $file->getUid();
-			$fileMetadata = $file->_getMetaData();
-			$cacheTags[] = 'sys_file_metadata_' . $fileMetadata['uid'];
-		}
+        if ($file instanceof File) {
+            $cacheTags[] = 'sys_file_' . $file->getUid();
+            $fileMetadata = $file->_getMetaData();
+            $cacheTags[] = 'sys_file_metadata_' . $fileMetadata['uid'];
+        }
 
-		$tsfe->addCacheTags($cacheTags);
-	}
+        $tsfe->addCacheTags($cacheTags);
+    }
 
-	/**
-	 * @return TypoScriptFrontendController
-	 */
-	protected function getTypoScriptFrontendController() {
-		return $GLOBALS['TSFE'];
-	}
+    /**
+     * @return TypoScriptFrontendController
+     */
+    protected function getTypoScriptFrontendController()
+    {
+        return $GLOBALS['TSFE'];
+    }
 }

@@ -10,52 +10,52 @@
 		<sorting>256</sorting>
 		<doktype>1</doktype>
 		<TSconfig>
-tx_gridelements.setup.2ColumnGrid {
-	title = 2 column grid
-	description = A grid element with two columns with identical width.
-	topLevelLayout = 1
-	config {
-		colCount = 2
-		rowCount = 1
-		rows {
+			tx_gridelements.setup.2ColumnGrid {
+			title = 2 column grid
+			description = A grid element with two columns with identical width.
+			topLevelLayout = 1
+			config {
+			colCount = 2
+			rowCount = 1
+			rows {
 			1 {
-				columns {
-					1 {
-						name = Left
-						colPos = 0
-					}
-					2 {
-						name = Right
-						colPos = 1
-					}
-				}
+			columns {
+			1 {
+			name = Left
+			colPos = 0
 			}
-		}
-	}
-}
+			2 {
+			name = Right
+			colPos = 1
+			}
+			}
+			}
+			}
+			}
+			}
 
 
-mod.web_layout.BackendLayouts {
+			mod.web_layout.BackendLayouts {
 
-	Content {
-		title = Content
-		config.backend_layout {
+			Content {
+			title = Content
+			config.backend_layout {
 			colCount = 1
 			rowCount = 1
 			rows {
-				1 {
-					columns {
-						1 {
-							name = Standard
-							rowspan = 1
-							colPos = 0
-						}
-					}
-				}
+			1 {
+			columns {
+			1 {
+			name = Standard
+			rowspan = 1
+			colPos = 0
 			}
-		}
-	}
-}
+			}
+			}
+			}
+			}
+			}
+			}
 		</TSconfig>
 	</pages>
 	<pages>

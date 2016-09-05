@@ -38,5 +38,4 @@ class RecordController extends ActionController
     {
         return null;
     }
-
 }

@@ -15,42 +15,44 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectPostInitHookInterface;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
-class ContentTagCollector implements ContentObjectPostInitHookInterface {
-	/**
-	 * Hook for post processing the initialization of ContentObjectRenderer
-	 *
-	 * @param ContentObjectRenderer $parentObject Parent content object
-	 */
-	public function postProcessContentObjectInitialization(
-		ContentObjectRenderer &$parentObject
-	) {
-		$tsfe = $this->getTypoScriptFrontendController();
-		if (!$tsfe instanceof TypoScriptFrontendController) {
-			return;
-		}
+class ContentTagCollector implements ContentObjectPostInitHookInterface
+{
+    /**
+     * Hook for post processing the initialization of ContentObjectRenderer
+     *
+     * @param ContentObjectRenderer $parentObject Parent content object
+     */
+    public function postProcessContentObjectInitialization(
+        ContentObjectRenderer &$parentObject
+    ) {
+        $tsfe = $this->getTypoScriptFrontendController();
+        if (!$tsfe instanceof TypoScriptFrontendController) {
+            return;
+        }
 
-		$cacheTags = [];
-		$contentData = $parentObject->data;
+        $cacheTags = [];
+        $contentData = $parentObject->data;
 
-		$table = $parentObject->getCurrentTable();
-		$uid = (int)$contentData['uid'];
-		if ($table === '' || $uid === 0) {
-			return;
-		}
+        $table = $parentObject->getCurrentTable();
+        $uid = (int)$contentData['uid'];
+        if ($table === '' || $uid === 0) {
+            return;
+        }
 
-		$cacheTags[] = $table . '_' . $uid;
+        $cacheTags[] = $table . '_' . $uid;
 
-		if (array_key_exists($contentData, '_LOCALIZED_UID') && (int)$contentData['_LOCALIZED_UID'] !== 0) {
-			$cacheTags[] = $table . '_' . $contentData['_LOCALIZED_UID'];
-		}
+        if (array_key_exists($contentData, '_LOCALIZED_UID') && (int)$contentData['_LOCALIZED_UID'] !== 0) {
+            $cacheTags[] = $table . '_' . $contentData['_LOCALIZED_UID'];
+        }
 
-		$tsfe->addCacheTags($cacheTags);
-	}
+        $tsfe->addCacheTags($cacheTags);
+    }
 
-	/**
-	 * @return TypoScriptFrontendController
-	 */
-	protected function getTypoScriptFrontendController() {
-		return $GLOBALS['TSFE'];
-	}
+    /**
+     * @return TypoScriptFrontendController
+     */
+    protected function getTypoScriptFrontendController()
+    {
+        return $GLOBALS['TSFE'];
+    }
 }

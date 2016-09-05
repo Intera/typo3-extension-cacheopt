@@ -1,15 +1,14 @@
 <?php
 
-########################################################################
-# Extension Manager/Repository config file for ext "mediaoembed".
-#
-# Auto generated 16-06-2011 23:48
-#
-# Manual updates:
-# Only the data in the array - everything else is removed by next
-# writing. "version" and "dependencies" must not be touched!
-########################################################################
-
+//
+// Extension Manager/Repository config file for ext "mediaoembed".
+//
+// Auto generated 16-06-2011 23:48
+//
+// Manual updates:
+// Only the data in the array - everything else is removed by next
+// writing. "version" and "dependencies" must not be touched!
+//
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Cache optimizer test',
     'description' => 'Test records for the cacheopt Extension.',
@@ -35,16 +34,9 @@ $EM_CONF[$_EXTKEY] = [
     'version' => '1.0.0',
     '_md5_values_when_last_written' => '',
     'constraints' => [
-        'depends' => [
-            'typo3' => '6.2.1-6.2.99',
-        ],
-        'conflicts' => [
-        ],
-        'suggests' => [
-        ],
+        'depends' => ['typo3' => '6.2.1-6.2.99'],
+        'conflicts' => [],
+        'suggests' => [],
     ],
-    'suggests' => [
-    ],
+    'suggests' => [],
 ];
-
-?>

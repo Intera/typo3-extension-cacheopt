@@ -12,7 +12,6 @@ namespace Tx\Cacheopt\Tests\Functional;
  *                                                                        */
 
 use TYPO3\CMS\Core\Tests\Functional\DataHandling\AbstractDataHandlerActionTestCase;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Base class for all functional tests of the cache optimizer.
@@ -182,7 +181,7 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
         while ($iterator->valid()) {
             /** @var $entry \SplFileInfo */
             $entry = $iterator->current();
-            // skip non-files/non-folders, and empty entries
+            // Skip non-files/non-folders, and empty entries.
             if (!$entry->isFile() || $entry->isDir() || $entry->getFilename() === '') {
                 $iterator->next();
                 continue;

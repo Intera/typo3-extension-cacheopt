@@ -67,7 +67,6 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
      */
     public function fileChangeClearsCacheForPagesReferencingToTheDirectory()
     {
-
         $this->fillPageCache(self::PAGE_UID_REFERENCED_DIRECTORY);
         $this->fillPageCache(self::PAGE_UID_REFERENCING_CONTENT_REFERENCING_DIRECTORY);
 
@@ -76,10 +75,10 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
                 [
                     'data' => 'testcontent_modified_directory',
                     'target' => $this->getRootFolderIdentifier() . ltrim(
-                            self::FILE_IDENTIFIER_REFERENCED_IN_DIRECTORY,
-                            '/'
-                        )
-                ]
+                        self::FILE_IDENTIFIER_REFERENCED_IN_DIRECTORY,
+                        '/'
+                    )
+                ],
             ],
         ];
 
@@ -96,7 +95,6 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
      */
     public function fileChangeClearsCacheForPagesReferencingToTheFile()
     {
-
         $this->fillPageCache(self::PAGE_UID_REFERENCED_FILE);
 
         $fileValues = [
@@ -104,7 +102,7 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
                 [
                     'data' => 'testcontent_modified',
                     'target' => $this->getRootFolderIdentifier() . ltrim(self::FILE_IDENTIFIER_REFERENCED, '/')
-                ]
+                ],
             ],
         ];
 
@@ -120,7 +118,6 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
      */
     public function fileUploadClearsCacheOfPageWhereOverwrittenFileIsReferenced()
     {
-
         $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][ResourceStorage::class]['className'] = ResourceStorageMock::class;
 
         $this->fillPageCache(self::PAGE_UID_REFERENCED_FILE);
@@ -138,7 +135,7 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
                 [
                     'data' => $uploadPosition,
                     'target' => $this->getRootFolderIdentifier() . ltrim(dirname(self::FILE_IDENTIFIER_REFERENCED), '/')
-                ]
+                ],
             ],
         ];
 
@@ -165,7 +162,6 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
     {
         $storage = $this->getDefaultStorage();
         $folderIdentifier = '/';
-        // the root of the storage
         return $storage->getUid() . ':' . $folderIdentifier;
     }
 
