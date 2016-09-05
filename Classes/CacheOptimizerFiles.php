@@ -283,7 +283,7 @@ class CacheOptimizerFiles implements SingletonInterface
         }
         $this->cacheOptimizerRegistry = GeneralUtility::makeInstance(CacheOptimizerRegistry::class);
         $this->cacheManager = GeneralUtility::makeInstance(CacheManager::class);
-        $this->databaseConnection = $GLOBALS['TSFE'];
+        $this->databaseConnection = $GLOBALS['TYPO3_DB'];
     }
 
     /**
