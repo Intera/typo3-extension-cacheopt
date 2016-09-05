@@ -11,6 +11,8 @@ namespace Tx\Cacheopt;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -31,6 +33,8 @@ class CacheApi implements SingletonInterface {
 	 * @param bool $useDataHandler If this is true the DataHandler will be used
 	 * instead of the CacheManager for cache clearing. This makes sure that the
 	 * hooks registered for clearPageCacheEval are called (e.g. those of realurl).
+	 * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
+	 * @throws \InvalidArgumentException
 	 */
 	public function flushCacheForPage($pageId, $useDataHandler) {
 
@@ -51,23 +55,26 @@ class CacheApi implements SingletonInterface {
 	 *
 	 * @param string $tablename
 	 * @param int $uid
+	 * @throws \InvalidArgumentException
 	 */
 	public function flushCacheForRecordWithDataHandler($tablename, $uid) {
-		/** @var \TYPO3\CMS\Core\DataHandling\DataHandler $tce */
-		$tce = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
+		$tce = GeneralUtility::makeInstance(DataHandler::class);
 		$tce->stripslashes_values = 0;
 		$tce->start(array(), array());
-		/** @noinspection PhpInternalEntityUsedInspection Since the clear_cache() method is deprecated we need to used this internal method. */
+		/** @noinspection PhpInternalEntityUsedInspection Since the clear_cache() method is deprecated we need
+		 * to used this internal method. */
 		$tce->registerRecordIdForPageCacheClearing($tablename, $uid);
 		$tce->process_datamap();
 	}
 
 	/**
 	 * Loads an instance of the cache manager in the cacheManager class variable.
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function initializeCacheManager() {
-		if (!isset($this->cacheManager)) {
-			$this->cacheManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager');
+		if ($this->cacheManager === NULL) {
+			$this->cacheManager = GeneralUtility::makeInstance(CacheManager::class);
 		}
 	}
 }

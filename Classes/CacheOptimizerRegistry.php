@@ -39,35 +39,6 @@ class CacheOptimizerRegistry implements SingletonInterface {
 	protected $databaseConnection;
 
 	/**
-	 * Array containing field names that should be excluded for a given
-	 * table when searching in the refindex. The table is used as array
-	 * key, the fields are stored in an indexed array:
-	 *
-	 * $excludedFieldsForTable = array(
-	 *   'mytable' => array(
-	 *     'myfield1',
-	 *     'myfield2'
-	 *   )
-	 * );
-	 *
-	 *
-	 * @var array
-	 */
-	protected $excludedFieldsForTable = array();
-
-	/**
-	 * Array containing tables that will be skipped during refindex traversal.
-	 *
-	 * @var array
-	 */
-	protected $excludedTables = array(
-		'fe_groups',
-		'fe_users',
-		'sys_file_storage' => TRUE,
-		'sys_language' => TRUE,
-	);
-
-	/**
 	 * Array containing UIDs of pages for which the cache has been flushed already.
 	 *
 	 * @var array
@@ -108,6 +79,7 @@ class CacheOptimizerRegistry implements SingletonInterface {
 	 * Returns an instance of the CacheOptimizerRegistry.
 	 *
 	 * @return CacheOptimizerRegistry
+	 * @throws \InvalidArgumentException
 	 */
 	public static function getInstance() {
 		return GeneralUtility::makeInstance('Tx\\Cacheopt\\CacheOptimizerRegistry');
@@ -121,23 +93,8 @@ class CacheOptimizerRegistry implements SingletonInterface {
 	 * @return array
 	 */
 	public function getContentTypesForTable($table) {
-		if (isset($this->contentTypesByTable[$table])) {
+		if (array_key_exists($table, $this->contentTypesByTable)) {
 			return $this->contentTypesByTable[$table];
-		} else {
-			return NULL;
-		}
-	}
-
-	/**
-	 * Returns an array of field names that should be excluded when searching
-	 * in the refindex or NULL if no fields should be excluded.
-	 *
-	 * @param string $table
-	 * @return array
-	 */
-	public function getExcludedFieldsForTable($table) {
-		if (isset($this->excludedFieldsForTable[$table])) {
-			return $this->excludedFieldsForTable[$table];
 		} else {
 			return NULL;
 		}
@@ -160,23 +117,11 @@ class CacheOptimizerRegistry implements SingletonInterface {
 	 * @return array
 	 */
 	public function getPluginTypesForTable($table) {
-		if (isset($this->pluginTypesByTable[$table])) {
+		if (array_key_exists($table, $this->pluginTypesByTable)) {
 			return $this->pluginTypesByTable[$table];
 		} else {
 			return NULL;
 		}
-	}
-
-	/**
-	 * Returns TRUE when the table should not be considered when traversing
-	 * the refindex. Tables that have relations to many records (like
-	 * sys_file_storage) are excluded to prevent memory overflow.
-	 *
-	 * @param string $tableName
-	 * @return bool
-	 */
-	public function isExcludedTable($tableName) {
-		return isset($this->excludedTables[$tableName]);
 	}
 
 	/**
@@ -212,7 +157,7 @@ class CacheOptimizerRegistry implements SingletonInterface {
 		if ($pid === 0) {
 			return TRUE;
 		}
-		return (array_search($pid, $this->flushedPageUids) !== FALSE);
+		return (in_array($pid, $this->flushedPageUids, TRUE) !== FALSE);
 	}
 
 	/**
@@ -221,15 +166,11 @@ class CacheOptimizerRegistry implements SingletonInterface {
 	 *
 	 * @param string $table The name of the table.
 	 * @param string $contentType The value in the CType column.
-	 * @param bool $excludeTable If TRUE the table will excluded from refindex traversal.
 	 * @return void
 	 * @api
 	 */
-	public function registerContentForTable($table, $contentType, $excludeTable = TRUE) {
+	public function registerContentForTable($table, $contentType) {
 		$this->contentTypesByTable[$table][] = $contentType;
-		if ($excludeTable) {
-			$this->registerExcludedTable($table);
-		}
 	}
 
 	/**
@@ -243,27 +184,6 @@ class CacheOptimizerRegistry implements SingletonInterface {
 		foreach ($tables as $table) {
 			$this->registerContentForTable($table, $contentType);
 		}
-	}
-
-	/**
-	 * Registers the given field to be excluded when searching in the refindex for records of the given table.
-	 *
-	 * @param string $table
-	 * @param string $field
-	 * @return void
-	 */
-	public function registerExcludedFieldForTable($table, $field) {
-		$this->excludedFieldsForTable[$table][] = $field;
-	}
-
-	/**
-	 * Excludes the given table from refindex traversal.
-	 *
-	 * @param string $table
-	 * @return void
-	 */
-	public function registerExcludedTable($table) {
-		$this->excludedTables[$table] = TRUE;
 	}
 
 	/**
@@ -292,16 +212,12 @@ class CacheOptimizerRegistry implements SingletonInterface {
 	 *
 	 * @param string $table The name of the table.
 	 * @param string $listType The value in the list_type column.
-	 * @param bool $excludeTable If TRUE the table will excluded from refindex traversal.
 	 * Since this makes sense in most cases TRUE is the default value.
 	 * @return void
 	 * @api
 	 */
-	public function registerPluginForTable($table, $listType, $excludeTable = TRUE) {
+	public function registerPluginForTable($table, $listType) {
 		$this->pluginTypesByTable[$table][] = $listType;
-		if ($excludeTable) {
-			$this->registerExcludedTable($table);
-		}
 	}
 
 	/**

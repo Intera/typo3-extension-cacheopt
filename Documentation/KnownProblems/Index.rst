@@ -11,7 +11,7 @@
 Known Problems
 ==============
 
-The Extension can slow down the Backend, escpecially when your harddisk I/O is not optimal.
+Your cache tags table might grow quite large over time. It might be possible that this causes problems.
 
 If you experience a problem please report it on Github:
 

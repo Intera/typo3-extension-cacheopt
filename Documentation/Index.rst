@@ -25,7 +25,7 @@ Cache optimizer
 
 	:Description:
 		This Extension autmatically clears the cache for related records and plugins using
-		the reference index and a register that relates plugin types with records.
+		enhanced cache tags and a register that relates plugin types with records.
 
 	:Keywords:
 		cache, clear

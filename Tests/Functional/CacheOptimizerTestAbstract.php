@@ -63,11 +63,6 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
     protected $pathsToLinkInTestInstance = [];
 
     /**
-     * @var \TYPO3\CMS\Core\Database\ReferenceIndex
-     */
-    protected $referenceIndex;
-
-    /**
      * @var array
      */
     protected $testExtensionsToLoad = [
@@ -80,8 +75,9 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
      */
     public function setUp()
     {
-
         $this->coreExtensionsToLoad[] = 'css_styled_content';
+
+        define('TX_CACHEOPT_FUNCTIONAL_TEST', true);
 
         parent::setUp();
 
@@ -89,10 +85,6 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
 
         $this->loadDatabaseFixtures();
         $this->copyFilesToTestInstance();
-        $this->referenceIndex = GeneralUtility::makeInstance(
-            'TYPO3\\CMS\\Core\\Database\\ReferenceIndex'
-        );
-        $this->updateReferenceIndex();
     }
 
     /**
@@ -167,9 +159,9 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
     protected function getPageCacheRecords($pageUid)
     {
         return $this->getDatabaseConnection()->exec_SELECTgetRows(
-            'id',
-            'cf_cache_pages_tags',
-            'tag=\'pageId_' . $pageUid . '\'',
+            'cf_cache_pages.id',
+            'cf_cache_pages, cf_cache_pages_tags',
+            'cf_cache_pages.identifier=cf_cache_pages_tags.identifier AND tag=\'pageId_' . $pageUid . '\'',
             '',
             '',
             1
@@ -198,13 +190,5 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
             $this->importDataSet($entry->getPathname());
             $iterator->next();
         }
-    }
-
-    /**
-     * Updates the reference index (needed for cache optimizer to work correctly).
-     */
-    protected function updateReferenceIndex()
-    {
-        $this->referenceIndex->updateIndex(false);
     }
 }

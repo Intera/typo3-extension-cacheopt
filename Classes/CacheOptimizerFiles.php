@@ -11,6 +11,7 @@ namespace Tx\Cacheopt;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\Folder;
@@ -21,20 +22,30 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * This cache optimizer hooks into the ResourceStorage and clears the cache
  * for all pages pointing to a changed file or folder.
  */
-class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInterface {
+class CacheOptimizerFiles implements SingletonInterface {
 
 	/**
 	 *
-	 * @var CacheApi
+	 * @var CacheManager
 	 */
-	protected $cacheApi;
+	protected $cacheManager;
+
+	/**
+	 * @var CacheOptimizerRegistry
+	 */
+	protected $cacheOptimizerRegistry;
+
+	/**
+	 * @var \TYPO3\CMS\Core\Database\DatabaseConnection
+	 */
+	protected $databaseConnection;
 
 	/**
 	 * Array containing all page UIDs for which the cache should be cleared.
 	 *
 	 * @var array
 	 */
-	protected $flushCachePids = array();
+	protected $flushCacheTags = array();
 
 	/**
 	 * Will be called after a file is added to a directory and flushes
@@ -43,6 +54,9 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 	 * @param FileInterface|File $file
 	 * @param Folder $targetFolder
 	 * @return void
+	 * @throws \RuntimeException
+	 * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
+	 * @throws \InvalidArgumentException
 	 */
 	public function handleFileAddPost(
 		/** @noinspection PhpUnusedParameterInspection */
@@ -51,10 +65,10 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 	) {
 		$this->initialize();
 		$this->flushCacheForRelatedFolders($targetFolder->getStorage()->getUid(), $targetFolder->getIdentifier());
-		if ($file instanceof \TYPO3\CMS\Core\Resource\File) {
-			$this->flushRelatedCacheForRecord('sys_file', $file->getUid());
+		if ($file instanceof File) {
+			$this->registerFileForCacheFlush($file->getUid());
 		}
-		$this->flushCacheForAllRegisteredPages();
+		$this->flushCacheForAllRegisteredTags();
 	}
 
 	/**
@@ -64,6 +78,9 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 	 * @param FileInterface $file
 	 * @param Folder $targetFolder
 	 * @return void
+	 * @throws \RuntimeException
+	 * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
+	 * @throws \InvalidArgumentException
 	 */
 	public function handleFileCopyPost(
 		/** @noinspection PhpUnusedParameterInspection */
@@ -72,7 +89,7 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 	) {
 		$this->initialize();
 		$this->flushCacheForRelatedFolders($targetFolder->getStorage()->getUid(), $targetFolder->getIdentifier());
-		$this->flushCacheForAllRegisteredPages();
+		$this->flushCacheForAllRegisteredTags();
 	}
 
 	/**
@@ -82,6 +99,9 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 	 * @param $newFileIdentifier
 	 * @param Folder $targetFolder
 	 * @return void
+	 * @throws \RuntimeException
+	 * @throws \InvalidArgumentException
+	 * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
 	 */
 	public function handleFileCreatePost(
 		/** @noinspection PhpUnusedParameterInspection */
@@ -90,7 +110,7 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 	) {
 		$this->initialize();
 		$this->flushCacheForRelatedFolders($targetFolder->getStorage()->getUid(), $targetFolder->getIdentifier());
-		$this->flushCacheForAllRegisteredPages();
+		$this->flushCacheForAllRegisteredTags();
 	}
 
 	/**
@@ -99,12 +119,15 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 	 *
 	 * @param FileInterface $file
 	 * @return void
+	 * @throws \RuntimeException
+	 * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
+	 * @throws \InvalidArgumentException
 	 */
 	public function handleFileDeletePost(FileInterface $file) {
 		$this->initialize();
 		$fileFolder = $file->getParentFolder();
 		$this->flushCacheForRelatedFolders($fileFolder->getStorage()->getUid(), $fileFolder->getIdentifier());
-		$this->flushCacheForAllRegisteredPages();
+		$this->flushCacheForAllRegisteredTags();
 	}
 
 	/**
@@ -116,6 +139,9 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 	 * @param Folder $targetFolder
 	 * @param Folder $originalFolder
 	 * @return void
+	 * @throws \RuntimeException
+	 * @throws \InvalidArgumentException
+	 * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
 	 */
 	public function handleFileMovePost(
 		FileInterface $file,
@@ -125,10 +151,10 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 	) {
 		$this->initialize();
 		$this->flushCacheForRelatedFolders($originalFolder->getStorage()->getUid(), $originalFolder->getIdentifier());
-		if ($file instanceof \TYPO3\CMS\Core\Resource\File) {
-			$this->flushRelatedCacheForRecord('sys_file', $file->getUid());
+		if ($file instanceof File) {
+			$this->registerFileForCacheFlush($file);
 		}
-		$this->flushCacheForAllRegisteredPages();
+		$this->flushCacheForAllRegisteredTags();
 	}
 
 	/**
@@ -138,6 +164,8 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 	 * @param FileInterface $file
 	 * @param $targetFolder
 	 * @return void
+	 * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
+	 * @throws \InvalidArgumentException
 	 */
 	public function handleFileRenamePost(
 		FileInterface $file,
@@ -145,10 +173,10 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 		$targetFolder
 	) {
 		$this->initialize();
-		if ($file instanceof \TYPO3\CMS\Core\Resource\File) {
-			$this->flushRelatedCacheForRecord('sys_file', $file->getUid());
+		if ($file instanceof File) {
+			$this->registerFileForCacheFlush($file);
 		}
-		$this->flushCacheForAllRegisteredPages();
+		$this->flushCacheForAllRegisteredTags();
 	}
 
 	/**
@@ -158,13 +186,19 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 	 * @param FileInterface $file
 	 * @param $localFilePath
 	 * @return void
+	 * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
+	 * @throws \InvalidArgumentException
 	 */
-	public function handleFileReplacePost($file, $localFilePath) {
+	public function handleFileReplacePost(
+		$file,
+		/** @noinspection PhpUnusedParameterInspection */
+		$localFilePath
+	) {
 		$this->initialize();
-		if ($file instanceof \TYPO3\CMS\Core\Resource\File) {
-			$this->flushRelatedCacheForRecord('sys_file', $file->getUid());
+		if ($file instanceof File) {
+			$this->registerFileForCacheFlush($file);
 		}
-		$this->flushCacheForAllRegisteredPages();
+		$this->flushCacheForAllRegisteredTags();
 	}
 
 	/**
@@ -174,6 +208,8 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 	 * @param FileInterface $file
 	 * @param $contents
 	 * @return void
+	 * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
+	 * @throws \InvalidArgumentException
 	 */
 	public function handleFileSetContentsPost(
 		FileInterface $file,
@@ -181,47 +217,92 @@ class CacheOptimizerFiles extends AbstractCacheOptimizer implements SingletonInt
 		$contents
 	) {
 		$this->initialize();
-		if ($file instanceof \TYPO3\CMS\Core\Resource\File) {
-			$this->flushRelatedCacheForRecord('sys_file', $file->getUid());
+		if ($file instanceof File) {
+			$this->registerFileForCacheFlush($file);
 		}
-		$this->flushCacheForAllRegisteredPages();
+		$this->flushCacheForAllRegisteredTags();
 	}
 
 	/**
 	 * Clears the cache for all registered page UIDs.
 	 *
 	 * @return void
+	 * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
 	 */
-	protected function flushCacheForAllRegisteredPages() {
-		$flushCachePids = array_unique($this->flushCachePids);
-		$this->flushCachePids = array();
-		foreach ($flushCachePids as $pageId) {
-			$this->cacheApi->flushCacheForPage($pageId, FALSE);
+	protected function flushCacheForAllRegisteredTags() {
+		$flushCacheTags = array_unique($this->flushCacheTags);
+		$this->flushCacheTags = array();
+		foreach ($flushCacheTags as $cacheTag) {
+			$this->cacheManager->flushCachesInGroupByTag('pages', $cacheTag);
 		}
 	}
 
 	/**
-	 * Registers the given page UID in the array of pages for which the
-	 * cache should be flushed at the end.
+	 * Searches for all records pointing to the given folder and flushes
+	 * the related page caches.
 	 *
-	 * @param int $pid
+	 * @param int $storageUid
+	 * @param string $folderIdentifier
 	 * @return void
+	 * @throws \RuntimeException
 	 */
-	protected function flushCacheForPage($pid) {
-		$this->flushCachePids[] = $pid;
+	protected function flushCacheForRelatedFolders($storageUid, $folderIdentifier) {
+		if ($this->cacheOptimizerRegistry->isProcessedFolder($storageUid, $folderIdentifier)) {
+			return;
+		}
+		$this->cacheOptimizerRegistry->registerProcessedFolder($storageUid, $folderIdentifier);
+		$fileCollectionResult = $this->databaseConnection->exec_SELECTquery(
+			'uid',
+			'sys_file_collection',
+			"deleted=0 AND type='folder' AND storage="
+			. (int)$storageUid . ' AND folder='
+			. $this->databaseConnection->fullQuoteStr($folderIdentifier, 'sys_file_collection')
+		);
+		while ($fileCollectionRow = $this->databaseConnection->sql_fetch_assoc($fileCollectionResult)) {
+			if (!is_array($fileCollectionRow)) {
+				throw new \RuntimeException('Database error while fetching file collections for folder.');
+			}
+			/** @var array $fileCollectionRow */
+			$this->registerRecordForCacheFlushing('sys_file_collection', $fileCollectionRow['uid']);
+		}
 	}
 
 	/**
 	 * Initializes all required classes.
 	 *
 	 * @return void
+	 * @throws \InvalidArgumentException
 	 */
 	protected function initialize() {
-		if (isset($this->databaseConnection)) {
+		if ($this->databaseConnection !== NULL) {
 			return;
 		}
-		parent::initialize();
-		$this->resourceFactory = \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance();
-		$this->cacheApi = GeneralUtility::makeInstance('Tx\\Cacheopt\\CacheApi');
+		$this->cacheOptimizerRegistry = GeneralUtility::makeInstance(CacheOptimizerRegistry::class);
+		$this->cacheManager = GeneralUtility::makeInstance(CacheManager::class);
+		$this->databaseConnection = $GLOBALS['TSFE'];
+	}
+
+	/**
+	 * Registers the given file for cache flushing.
+	 *
+	 * @param File $file
+	 */
+	protected function registerFileForCacheFlush(File $file) {
+		$this->registerRecordForCacheFlushing('sys_file', $file->getUid());
+	}
+
+	/**
+	 * Registers the given page UID in the array of pages for which the
+	 * cache should be flushed at the end.
+	 *
+	 * @param string $table
+	 * @param int $uid
+	 */
+	protected function registerRecordForCacheFlushing($table, $uid) {
+		if ($this->cacheOptimizerRegistry->isProcessedRecord($table, $uid)) {
+			return;
+		}
+		$this->cacheOptimizerRegistry->registerProcessedRecord($table, $uid);
+		$this->flushCacheTags[] = $table . '_' . $uid;
 	}
 }

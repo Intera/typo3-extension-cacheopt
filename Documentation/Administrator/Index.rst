@@ -18,14 +18,6 @@ Installation
 
 Import the extension in the extension manager and install it.
 
-You need to make sure that your reference index is up to date. You can
-either use the DB check Backend module or the command line:
-
-::
-
-  php /path/to/typo3/installation/typo3/cli_dispatch.phpsh lowlevel_refindex -e
-
-
 This Extension works out of the box with no special configuration needed
 for default TYPO3 installations.
 

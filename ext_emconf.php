@@ -22,16 +22,16 @@ $EM_CONF[$_EXTKEY] = array (
 	'author' => 'Alexander Stehlik',
 	'author_email' => 'astehlik.deleteme@intera.de',
 	'author_company' => 'Intera GmbH',
-	'constraints' => 
+	'constraints' =>
 	array (
-		'depends' => 
+		'depends' =>
 		array (
-			'typo3' => '6.2.1-6.2.99',
+			'typo3' => '6.2.1-7.99.99',
 		),
-		'conflicts' => 
+		'conflicts' =>
 		array (
 		),
-		'suggests' => 
+		'suggests' =>
 		array (
 		),
 	),

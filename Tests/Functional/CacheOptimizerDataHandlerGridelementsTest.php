@@ -38,8 +38,6 @@ class CacheOptimizerDataHandlerGridelementsTest extends CacheOptimizerTestAbstra
         $this->importDataSet(
             ORIGINAL_ROOT . 'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Database/gridelements/tt_content.xml'
         );
-
-        $this->updateReferenceIndex();
     }
 
     /**

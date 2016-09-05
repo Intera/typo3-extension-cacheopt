@@ -16,6 +16,10 @@ Extension Developers
 Register plugins and content types
 ----------------------------------
 
+**Please note that this is only a workaround for Extensions that do not properly handle caching.** It is
+not optimal because it clears the cache of all pages where the related plugin is used. Do not use in sites
+with high performance requirements!
+
 The cacheopt Extension needs to know which tables belong to which content
 type or which plugin type. This information is stored in the
 :php:`CacheOptimizerRegistry`.
@@ -59,58 +63,4 @@ plugin types:
     ),
     'my_plugin_type'
   );
-
-Excluding tables from reference index traveral
-----------------------------------------------
-
-It does not make sense to traverse the reference index for all tables and all fields.
-
-Default configuration
-~~~~~~~~~~~~~~~~~~~~~
-
-Some tables are already excluded by default to prevent endless cache
-clearing processes which might occur when a record is related to
-many other records, like sys_langauge:
-
-- ``fe_groups``
-- ``fe_users``
-- ``sys_file_storage``
-- ``sys_language``
-
-Exclude addtional tables / fields
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To exclude an additional table from refindex traversal you can also use
-the registry:
-
-::
-
-  \Tx\Cacheopt\CacheOptimizerRegistry::getInstance()
-  	->registerExcludedTable('tx_myext_mytable');
-
-In some cases it can also make sense to exclude certain fields from refindex
-traversal to prevent a too exhaustive cache clearing. For this you can use:
-
-::
-
-  \Tx\Cacheopt\CacheOptimizerRegistry::getInstance()
-  	->registerExcludedFieldForTable('tx_myext_mytable', 'my_excluded_field');
-
-Prevent automatic exclusion
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-All tables registered to plugins or content types will be excluded by
-default because in most cases it is enough to clear the cache for the
-related content elements.
-
-To prevent this you can provide an additional third parameter to the register
-methods:
-
-::
-
-  \Tx\Cacheopt\CacheOptimizerRegistry::getInstance()
-  	->registerContentForTable('tx_myext_mytable', 'my_content_type', FALSE);
-
-  \Tx\Cacheopt\CacheOptimizerRegistry::getInstance()
-  	->registerPluginForTable('tx_myext_mytable', 'my_plugin_type', FALSE);
 

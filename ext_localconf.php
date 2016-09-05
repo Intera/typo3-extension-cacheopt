@@ -1,6 +1,6 @@
 <?php
 if (!defined('TYPO3_MODE')) {
-	die ('Access denied.');
+    die ('Access denied.');
 }
 
 // Hook into the data handler to clear the cache for related records.
@@ -14,11 +14,28 @@ if (
 		'Tx\\Cacheopt\\CacheOptimizerDataHandler->dataHandlerClearPageCacheEval');
 
 } else {
-
 	$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['clearPageCacheEval'][] =
 		'Tx\\Cacheopt\\CacheOptimizerDataHandler->dataHandlerClearPageCacheEval';
 }
 
+
+if (TYPO3_MODE === 'FE' || defined('TX_CACHEOPT_FUNCTIONAL_TEST')) {
+    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_content.php']['postInit']['tx_cacheopt']
+        = \Tx\Cacheopt\TagCollector\ContentTagCollector::class;
+
+    /** @var \TYPO3\CMS\Extbase\SignalSlot\Dispatcher $signalSlotDispatcher */
+    $signalSlotDispatcher = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+        'TYPO3\\CMS\\Extbase\\SignalSlot\\Dispatcher'
+    );
+
+    // Hook in every time a public URL is requested to collect file related cache tags.
+    $signalSlotDispatcher->connect(
+        \TYPO3\CMS\Core\Resource\ResourceStorage::class,
+        \TYPO3\CMS\Core\Resource\ResourceStorage::SIGNAL_PreGeneratePublicUrl,
+        \Tx\Cacheopt\TagCollector\FileTagCollector::class,
+        'collectTagsForPreGeneratePublicUrl'
+    );
+}
 // Hook into the file handling to clear the cache for related records.
 /** @var \TYPO3\CMS\Extbase\SignalSlot\Dispatcher $signalSlotDispatcher */
 $signalSlotDispatcher = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\SignalSlot\\Dispatcher');
@@ -33,28 +50,17 @@ $signalSlotDispatcher->connect('TYPO3\\CMS\\Core\\Resource\\ResourceStorage', \T
 
 $cacheOptimizerRegistry = \Tx\Cacheopt\CacheOptimizerRegistry::getInstance();
 
-// Default configuration for the news Extension.
-if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('news')) {
-
-	// Since news has its own cache handling we exclude the news records from further processing.
-	$cacheOptimizerRegistry->registerExcludedTable('tx_news_domain_model_news');
-	$cacheOptimizerRegistry->registerExcludedTable('tx_news_domain_model_tag');
-}
-
 // Default configuration for the cz_simple_cal Extension.
 if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('cz_simple_cal')) {
 
-	$cacheOptimizerRegistry->registerPluginForTables(
-		array(
-			'tx_czsimplecal_domain_model_address',
-			'tx_czsimplecal_domain_model_category',
-			'tx_czsimplecal_domain_model_event',
-		),
-		'czsimplecal_pi1'
-	);
-
-	// We do not want refindex traversal for the event index table.
-	$cacheOptimizerRegistry->registerExcludedTable('tx_czsimplecal_domain_model_eventindex');
+    $cacheOptimizerRegistry->registerPluginForTables(
+        [
+            'tx_czsimplecal_domain_model_address',
+            'tx_czsimplecal_domain_model_category',
+            'tx_czsimplecal_domain_model_event',
+        ],
+        'czsimplecal_pi1'
+    );
 }
 
 unset($cacheOptimizerRegistry);

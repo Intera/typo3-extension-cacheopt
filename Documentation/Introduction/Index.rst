@@ -18,7 +18,7 @@ What does it do?
 
 This Extension improves the cache clearing process of TYPO3.
 
-It uses the reference index to clear the cache in these use cases:
+It uses an enhanced tag handling to clear the cache in these use cases:
 
 - When a content element is changed the cache of all pages is cleared
   where this content element is referenced by a shortcut.
