@@ -170,7 +170,9 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
      */
     protected function initFileProcessor()
     {
-        $this->fileProcessor->init([], $GLOBALS['TYPO3_CONF_VARS']['BE']['fileExtensions']);
+        if (method_exists($this->fileProcessor, 'init')) {
+            $this->fileProcessor->init([], $GLOBALS['TYPO3_CONF_VARS']['BE']['fileExtensions']);
+        }
         if (method_exists($this->fileProcessor, 'setExistingFilesConflictMode')) {
             $this->fileProcessor->setExistingFilesConflictMode(DuplicationBehavior::REPLACE);
         } else {
