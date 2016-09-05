@@ -13,6 +13,6 @@
 		<fieldname>media</fieldname>
 		<sorting_foreign>1</sorting_foreign>
 		<table_local>sys_file</table_local>
-		<l10n_diffsource />
+		<l10n_diffsource/>
 	</sys_file_reference>
 </dataset>

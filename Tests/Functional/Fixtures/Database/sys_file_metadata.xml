@@ -7,7 +7,7 @@
 		<crdate>1401391189</crdate>
 		<cruser_id>1</cruser_id>
 		<file>27</file>
-		<l10n_diffsource />
+		<l10n_diffsource/>
 	</sys_file_metadata>
 	<sys_file_metadata>
 		<uid>27</uid>
@@ -16,7 +16,7 @@
 		<crdate>1401391190</crdate>
 		<cruser_id>1</cruser_id>
 		<file>24</file>
-		<l10n_diffsource />
+		<l10n_diffsource/>
 	</sys_file_metadata>
 	<sys_file_metadata>
 		<uid>28</uid>
@@ -25,6 +25,6 @@
 		<crdate>1401391190</crdate>
 		<cruser_id>1</cruser_id>
 		<file>25</file>
-		<l10n_diffsource />
+		<l10n_diffsource/>
 	</sys_file_metadata>
 </dataset>

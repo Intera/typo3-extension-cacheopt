@@ -12,175 +12,199 @@ namespace Tx\Cacheopt\Tests\Functional;
  *                                                                        */
 
 use TYPO3\CMS\Core\Tests\Functional\DataHandling\AbstractDataHandlerActionTestCase;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Base class for all functional tests of the cache optimizer.
  */
-abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestCase {
+abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestCase
+{
+    const PAGE_UID_REFERENCED_DIRECTORY = 131;
 
-	const PAGE_UID_REFERENCED_DIRECTORY = 131;
+    const PAGE_UID_REFERENCED_FILE = 130;
 
-	const PAGE_UID_REFERENCED_FILE = 130;
+    /**
+     * We want the folders containing the test files to be created.
+     *
+     * @var array
+     */
+    protected $additionalFoldersToCreate = [
+        '/fileadmin/testdirectory',
+        '/fileadmin/testdirectory_referenced',
+        '/typo3temp/uploadfiles',
+    ];
 
-	/**
-	 * We want the folders containing the test files to be created.
-	 *
-	 * @var array
-	 */
-	protected $additionalFoldersToCreate = array(
-		'/fileadmin/testdirectory',
-		'/fileadmin/testdirectory_referenced',
-		'/typo3temp/uploadfiles',
-	);
+    /**
+     * We do not expect any error log entries.
+     *
+     * @var array
+     */
+    protected $expectedErrorLogEntries = null;
 
-	/**
-	 * We do not expect any error log entries.
-	 *
-	 * @var array
-	 */
-	protected $expectedErrorLogEntries = NULL;
+    /**
+     * The files that should be copied to the test instance.
+     *
+     * @var array
+     */
+    protected $filesToCopyInTestInstance = [
+        'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Files/fileadmin/testdirectory/testfile.txt' => 'fileadmin/testdirectory/testfile.txt',
+        'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Files/fileadmin/testdirectory/testfile_referenced.txt' => 'fileadmin/testdirectory/testfile_referenced.txt',
+        'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Files/fileadmin/testdirectory_referenced/file_in_referenced_dir.txt' => 'fileadmin/testdirectory_referenced/file_in_referenced_dir.txt',
+        'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Files/typo3temp/uploadfiles/testfile_referenced.txt' => 'typo3temp/uploadfiles/testfile_referenced.txt',
+    ];
 
-	/**
-	 * The files that should be copied to the test instance.
-	 *
-	 * @var array
-	 */
-	protected $filesToCopyInTestInstance = array(
-		'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Files/fileadmin/testdirectory/testfile.txt' => 'fileadmin/testdirectory/testfile.txt',
-		'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Files/fileadmin/testdirectory/testfile_referenced.txt' => 'fileadmin/testdirectory/testfile_referenced.txt',
-		'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Files/fileadmin/testdirectory_referenced/file_in_referenced_dir.txt' => 'fileadmin/testdirectory_referenced/file_in_referenced_dir.txt',
-		'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Files/typo3temp/uploadfiles/testfile_referenced.txt' => 'typo3temp/uploadfiles/testfile_referenced.txt',
-	);
+    /**
+     * We need to remove the additional configuration of our base class,
+     * otherwise the content renderer will not work properly and the cache
+     * will not be filled.
+     *
+     * @var array
+     */
+    protected $pathsToLinkInTestInstance = [];
 
-	/**
-	 * We need to remove the additional configuration of our base class,
-	 * otherwise the content renderer will not work properly and the cache
-	 * will not be filled.
-	 *
-	 * @var array
-	 */
-	protected $pathsToLinkInTestInstance = array();
+    /**
+     * @var \TYPO3\CMS\Core\Database\ReferenceIndex
+     */
+    protected $referenceIndex;
 
-	/**
-	 * @var \TYPO3\CMS\Core\Database\ReferenceIndex
-	 */
-	protected $referenceIndex;
+    /**
+     * @var array
+     */
+    protected $testExtensionsToLoad = [
+        'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Extensions/cacheopt_test',
+        'typo3conf/ext/cacheopt',
+    ];
 
-	/**
-	 * @var array
-	 */
-	protected $testExtensionsToLoad = array(
-		'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Extensions/cacheopt_test',
-		'typo3conf/ext/cacheopt',
-	);
+    /**
+     * Sets up the test environment.
+     */
+    public function setUp()
+    {
 
-	/**
-	 * Sets up the test environment.
-	 */
-	public function setUp() {
+        $this->coreExtensionsToLoad[] = 'css_styled_content';
 
-		$this->coreExtensionsToLoad[] = 'css_styled_content';
+        parent::setUp();
 
-		parent::setUp();
+        unset($GLOBALS['TYPO3_CONF_VARS']['LOG']);
 
-		unset($GLOBALS['TYPO3_CONF_VARS']['LOG']);
+        $this->loadDatabaseFixtures();
+        $this->copyFilesToTestInstance();
+        $this->referenceIndex = GeneralUtility::makeInstance(
+            'TYPO3\\CMS\\Core\\Database\\ReferenceIndex'
+        );
+        $this->updateReferenceIndex();
+    }
 
-		$this->loadDatabaseFixtures();
-		$this->copyFilesToTestInstance();
-		$this->referenceIndex = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\ReferenceIndex');
-		$this->updateReferenceIndex();
-	}
+    /**
+     * Asserts that the page cache for the given page is empty.
+     *
+     * @param int $pageUid
+     */
+    protected function assertPageCacheIsEmpty($pageUid)
+    {
+        $cacheEntries = $this->getPageCacheRecords($pageUid);
+        $this->assertCount(0, $cacheEntries, 'Page cache for page ' . $pageUid . ' is not empty.');
+    }
 
-	/**
-	 * Asserts that the page cache for the given page is empty.
-	 *
-	 * @param int $pageUid
-	 */
-	protected function assertPageCacheIsEmpty($pageUid) {
-		$cacheEntries = $this->getPageCacheRecords($pageUid);
-		$this->assertEquals(0, count($cacheEntries), 'Page cache for page ' . $pageUid . ' is not empty.');
-	}
+    /**
+     * Asserts that the page cache for the given page is filled.
+     *
+     * @param int $pageUid
+     */
+    protected function assertPageCacheIsFilled($pageUid)
+    {
+        $cacheEntries = $this->getDatabaseConnection()->exec_SELECTgetRows(
+            'id',
+            'cf_cache_pages_tags',
+            'tag=\'pageId_' . $pageUid . '\''
+        );
+        $this->assertGreaterThanOrEqual(1, count($cacheEntries), 'Page cache for page ' . $pageUid . ' is not filled.');
+    }
 
-	/**
-	 * Asserts that the page cache for the given page is filled.
-	 *
-	 * @param int $pageUid
-	 */
-	protected function assertPageCacheIsFilled($pageUid) {
-		$cacheEntries = $this->getDatabaseConnection()->exec_SELECTgetRows('id', 'cf_cache_pages_tags', 'tag=\'pageId_' . $pageUid . '\'');
-		$this->assertGreaterThanOrEqual(1, count($cacheEntries), 'Page cache for page ' . $pageUid . ' is not filled.');
-	}
+    /**
+     * Copies the files defined in $filesToCopyInTestInstance to the test instance.
+     *
+     * @throws \RuntimeException
+     */
+    protected function copyFilesToTestInstance()
+    {
+        foreach ($this->filesToCopyInTestInstance as $sourcePathToLinkInTestInstance => $destinationPathToLinkInTestInstance) {
+            $sourcePath = ORIGINAL_ROOT . '/' . ltrim($sourcePathToLinkInTestInstance, '/');
+            if (!file_exists($sourcePath)) {
+                throw new \RuntimeException(
+                    'Path ' . $sourcePath . ' not found',
+                    1376745645
+                );
+            }
+            $destinationPath = PATH_site . '/' . ltrim($destinationPathToLinkInTestInstance, '/');
+            $success = copy($sourcePath, $destinationPath);
+            if (!$success) {
+                throw new \RuntimeException(
+                    'Can not copy the path ' . $sourcePath . ' to ' . $destinationPath,
+                    1389969623
+                );
+            }
+        }
+    }
 
-	/**
-	 * Copies the files defined in $filesToCopyInTestInstance to the test instance.
-	 *
-	 * @throws \Exception
-	 */
-	protected function copyFilesToTestInstance() {
-		foreach ($this->filesToCopyInTestInstance as $sourcePathToLinkInTestInstance => $destinationPathToLinkInTestInstance) {
-			$sourcePath = ORIGINAL_ROOT . '/' . ltrim($sourcePathToLinkInTestInstance, '/');
-			if (!file_exists($sourcePath)) {
-				throw new \Exception(
-					'Path ' . $sourcePath . ' not found',
-					1376745645
-				);
-			}
-			$destinationPath = PATH_site . '/' . ltrim($destinationPathToLinkInTestInstance, '/');
-			$success = copy($sourcePath, $destinationPath);
-			if (!$success) {
-				throw new \Exception(
-					'Can not copy the path ' . $sourcePath . ' to ' . $destinationPath,
-					1389969623
-				);
-			}
-		}
-	}
+    /**
+     * Fills the page cache for the page with the given ID and makes sure
+     *
+     * @param int $pageUid
+     */
+    protected function fillPageCache($pageUid)
+    {
+        $this->getFrontendResponse($pageUid)->getContent();
+        $this->assertPageCacheIsFilled($pageUid);
+    }
 
-	/**
-	 * Fills the page cache for the page with the given ID and makes sure
-	 *
-	 * @param int $pageUid
-	 */
-	protected function fillPageCache($pageUid) {
-		$this->getFrontendResponse($pageUid)->getContent();
-		$this->assertPageCacheIsFilled($pageUid);
-	}
+    /**
+     * Retrieves one page cache record that belongs to the page with the given UID.
+     *
+     * @param int $pageUid
+     * @return array|NULL
+     */
+    protected function getPageCacheRecords($pageUid)
+    {
+        return $this->getDatabaseConnection()->exec_SELECTgetRows(
+            'id',
+            'cf_cache_pages_tags',
+            'tag=\'pageId_' . $pageUid . '\'',
+            '',
+            '',
+            1
+        );
+    }
 
-	/**
-	 * Retrieves one page cache record that belongs to the page with the given UID.
-	 *
-	 * @param int $pageUid
-	 * @return array|NULL
-	 */
-	protected function getPageCacheRecords($pageUid) {
-		return $this->getDatabaseConnection()->exec_SELECTgetRows('id', 'cf_cache_pages_tags', 'tag=\'pageId_' . $pageUid . '\'', '', '', 1);
-	}
+    /**
+     * Loads all required database fixtures from the EXT:cacheopt/Tests/Functional/Fixtures/Database directory.
+     */
+    protected function loadDatabaseFixtures()
+    {
+        $fixtureDir = ORIGINAL_ROOT . 'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Database/';
+        $iteratorMode = \FilesystemIterator::UNIX_PATHS
+            | \FilesystemIterator::SKIP_DOTS
+            | \FilesystemIterator::CURRENT_AS_FILEINFO;
+        $iterator = new \RecursiveDirectoryIterator($fixtureDir, $iteratorMode);
 
-	/**
-	 * Loads all required database fixtures from the EXT:cacheopt/Tests/Functional/Fixtures/Database directory.
-	 */
-	protected function loadDatabaseFixtures() {
-		$fixtureDir = ORIGINAL_ROOT . 'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Database/';
-		$iteratorMode = \FilesystemIterator::UNIX_PATHS | \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_FILEINFO;
-		$iterator = new \RecursiveDirectoryIterator($fixtureDir, $iteratorMode);
+        while ($iterator->valid()) {
+            /** @var $entry \SplFileInfo */
+            $entry = $iterator->current();
+            // skip non-files/non-folders, and empty entries
+            if (!$entry->isFile() || $entry->isDir() || $entry->getFilename() === '') {
+                $iterator->next();
+                continue;
+            }
+            $this->importDataSet($entry->getPathname());
+            $iterator->next();
+        }
+    }
 
-		while ($iterator->valid()) {
-			/** @var $entry \SplFileInfo */
-			$entry = $iterator->current();
-			// skip non-files/non-folders, and empty entries
-			if (!$entry->isFile() || $entry->isDir() || $entry->getFilename() === '') {
-				$iterator->next();
-				continue;
-			}
-			$this->importDataSet($entry->getPathname());
-			$iterator->next();
-		}
-	}
-
-	/**
-	 * Updates the reference index (needed for cache optimizer to work correctly).
-	 */
-	protected function updateReferenceIndex() {
-		$this->referenceIndex->updateIndex(FALSE);
-	}
+    /**
+     * Updates the reference index (needed for cache optimizer to work correctly).
+     */
+    protected function updateReferenceIndex()
+    {
+        $this->referenceIndex->updateIndex(false);
+    }
 }

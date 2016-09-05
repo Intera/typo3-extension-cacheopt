@@ -16,24 +16,27 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 /**
  * Dummy controller for rendering records.
  */
-class RecordController extends ActionController {
+class RecordController extends ActionController
+{
 
-	/**
-	 * We do not need a view since we only render a dummy string.
-	 *
-	 * @return null
-	 */
-	protected function resolveView() {
-		return NULL;
-	}
+    /**
+     * Display a dummy string.
+     *
+     * @return string
+     */
+    public function displayAction()
+    {
+        return 'test';
+    }
 
-	/**
-	 * Display a dummy string.
-	 *
-	 * @return string
-	 */
-	public function displayAction() {
-		return 'test';
-	}
+    /**
+     * We do not need a view since we only render a dummy string.
+     *
+     * @return null
+     */
+    protected function resolveView()
+    {
+        return null;
+    }
 
 }
