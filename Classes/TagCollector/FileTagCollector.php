@@ -13,9 +13,9 @@ namespace Tx\Cacheopt\TagCollector;
 
 use TYPO3\CMS\Core\Resource\Driver\DriverInterface;
 use TYPO3\CMS\Core\Resource\File;
-use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\FileReference;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
+use TYPO3\CMS\Core\Resource\ResourceInterface;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
@@ -24,7 +24,7 @@ class FileTagCollector
     /**
      * @param ResourceStorage $storage
      * @param DriverInterface $driver
-     * @param FileInterface $resourceObject
+     * @param ResourceInterface $resourceObject
      * @param $relativeToCurrentScript
      * @param array $urlData
      */
@@ -32,7 +32,7 @@ class FileTagCollector
         /** @noinspection PhpUnusedParameterInspection */
         ResourceStorage $storage,
         DriverInterface $driver,
-        FileInterface $resourceObject,
+        ResourceInterface $resourceObject,
         $relativeToCurrentScript,
         array $urlData
     ) {
