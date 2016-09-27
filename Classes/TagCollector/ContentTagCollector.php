@@ -41,7 +41,7 @@ class ContentTagCollector implements ContentObjectPostInitHookInterface
 
         $cacheTags[] = $table . '_' . $uid;
 
-        if (array_key_exists($contentData, '_LOCALIZED_UID') && (int)$contentData['_LOCALIZED_UID'] !== 0) {
+        if (array_key_exists('_LOCALIZED_UID', $contentData) && (int)$contentData['_LOCALIZED_UID'] !== 0) {
             $cacheTags[] = $table . '_' . $contentData['_LOCALIZED_UID'];
         }
 
