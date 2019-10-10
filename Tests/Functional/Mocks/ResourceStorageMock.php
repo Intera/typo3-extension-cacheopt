@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Tx\Cacheopt\Tests\Functional\Mocks;
 
 /*                                                                        *
@@ -11,6 +13,7 @@ namespace Tx\Cacheopt\Tests\Functional\Mocks;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -23,7 +26,7 @@ class ResourceStorageMock extends ResourceStorage
      * Disables the is_uploaded_file() check and only makes sure the user has permissions to add a file to a folder.
      *
      * @param string $localFilePath the temporary file name from $_FILES['file1']['tmp_name']
-     * @param \TYPO3\CMS\Core\Resource\Folder $targetFolder
+     * @param Folder $targetFolder
      * @param string $targetFileName the destination file name $_FILES['file1']['name']
      * @param int $uploadedFileSize
      * @return void

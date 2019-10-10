@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Tx\Cacheopt;
 
 /*                                                                        *
@@ -11,6 +13,9 @@ namespace Tx\Cacheopt;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use InvalidArgumentException;
+use RuntimeException;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 
@@ -33,7 +38,7 @@ class CacheOptimizerDataHandler
     protected $currentPageIdArray;
 
     /**
-     * @var \TYPO3\CMS\Core\Database\DatabaseConnection
+     * @var DatabaseConnection
      */
     protected $databaseConnection;
 
@@ -51,9 +56,9 @@ class CacheOptimizerDataHandler
      * table => the name of the table of the current record
      * uid =>  the uid of the record
      * functionID => is always clear_cache()
-     * @param \TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @param DataHandler $dataHandler
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
      */
     public function dataHandlerClearPageCacheEval(
         array $parameters,
@@ -106,7 +111,7 @@ class CacheOptimizerDataHandler
      *
      * @param string $table
      * @return string
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function getTtContentWhereStatementForTable($table)
     {
@@ -144,7 +149,7 @@ class CacheOptimizerDataHandler
      * Initializes required objects.
      *
      * @return void
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function initialize()
     {
@@ -177,8 +182,8 @@ class CacheOptimizerDataHandler
      *
      * @param string $table
      * @return void
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
      */
     protected function registerRelatedPluginPagesForCacheFlush($table)
     {
@@ -195,7 +200,7 @@ class CacheOptimizerDataHandler
         $pageUidResult = $this->databaseConnection->sql_query($pageUidQuery);
         while ($pageUidRow = $this->databaseConnection->sql_fetch_assoc($pageUidResult)) {
             if (!is_array($pageUidRow)) {
-                throw new \RuntimeException('Database error fechting related plugin pages.');
+                throw new RuntimeException('Database error fechting related plugin pages.');
             }
             /** @var array $pageUidRow $pid */
             $pid = $pageUidRow['pid'];

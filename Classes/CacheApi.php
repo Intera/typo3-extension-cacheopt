@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Tx\Cacheopt;
 
 /*                                                                        *
@@ -11,7 +13,9 @@ namespace Tx\Cacheopt;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use InvalidArgumentException;
 use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -22,7 +26,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class CacheApi implements SingletonInterface
 {
     /**
-     * @var \TYPO3\CMS\Core\Cache\CacheManager
+     * @var CacheManager
      */
     protected $cacheManager;
 
@@ -33,8 +37,8 @@ class CacheApi implements SingletonInterface
      * @param bool $useDataHandler If this is true the DataHandler will be used
      * instead of the CacheManager for cache clearing. This makes sure that the
      * hooks registered for clearPageCacheEval are called (e.g. those of realurl).
-     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
-     * @throws \InvalidArgumentException
+     * @throws NoSuchCacheGroupException
+     * @throws InvalidArgumentException
      */
     public function flushCacheForPage($pageId, $useDataHandler)
     {
@@ -55,7 +59,7 @@ class CacheApi implements SingletonInterface
      *
      * @param string $tablename
      * @param int $uid
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function flushCacheForRecordWithDataHandler($tablename, $uid)
     {
@@ -71,7 +75,7 @@ class CacheApi implements SingletonInterface
     /**
      * Loads an instance of the cache manager in the cacheManager class variable.
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function initializeCacheManager()
     {

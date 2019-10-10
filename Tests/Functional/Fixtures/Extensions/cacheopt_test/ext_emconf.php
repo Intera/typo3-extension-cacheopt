@@ -1,14 +1,8 @@
 <?php
+/** @noinspection PhpMissingStrictTypesDeclarationInspection */
 
-//
-// Extension Manager/Repository config file for ext "mediaoembed".
-//
-// Auto generated 16-06-2011 23:48
-//
-// Manual updates:
-// Only the data in the array - everything else is removed by next
-// writing. "version" and "dependencies" must not be touched!
-//
+/** @var string $_EXTKEY */
+
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Cache optimizer test',
     'description' => 'Test records for the cacheopt Extension.',
@@ -25,18 +19,13 @@ $EM_CONF[$_EXTKEY] = [
     'createDirs' => '',
     'modify_tables' => '',
     'clearCacheOnLoad' => 1,
-    'lockType' => 'S',
     'author' => 'Alexander Stehlik',
     'author_email' => 'astehlik.deleteme@intera.de',
     'author_company' => 'Intera GmbH',
-    'CGLcompliance' => '',
-    'CGLcompliance_note' => '',
     'version' => '1.0.0',
-    '_md5_values_when_last_written' => '',
     'constraints' => [
-        'depends' => ['typo3' => '6.2.1-6.2.99'],
+        'depends' => ['typo3' => '9.5.0-9.5.99'],
         'conflicts' => [],
         'suggests' => [],
     ],
-    'suggests' => [],
 ];

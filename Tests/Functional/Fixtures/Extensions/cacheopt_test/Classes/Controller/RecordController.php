@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Tx\CacheoptTest\Controller;
 
 /*                                                                        *
@@ -18,7 +20,6 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
  */
 class RecordController extends ActionController
 {
-
     /**
      * Display a dummy string.
      *

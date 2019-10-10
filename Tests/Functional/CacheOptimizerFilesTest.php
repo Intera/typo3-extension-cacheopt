@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Tx\Cacheopt\Tests\Functional;
 
 /*                                                                        *
@@ -11,9 +13,12 @@ namespace Tx\Cacheopt\Tests\Functional;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Cacheopt\CacheOptimizerFiles;
 use Tx\Cacheopt\Tests\Functional\Mocks\ResourceStorageMock;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
+use TYPO3\CMS\Core\Resource\StorageRepository;
+use TYPO3\CMS\Core\Utility\File\ExtendedFileUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -21,7 +26,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
 {
-
     const FILE_IDENTIFIER_REFERENCED = '/testdirectory/testfile_referenced.txt';
 
     const FILE_IDENTIFIER_REFERENCED_IN_DIRECTORY = '/testdirectory_referenced/file_in_referenced_dir.txt';
@@ -31,17 +35,17 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
     const RESOURCE_STORAGE_UID = 1;
 
     /**
-     * @var \Tx\Cacheopt\CacheOptimizerFiles
+     * @var CacheOptimizerFiles
      */
     protected $cacheOptimizerFiles;
 
     /**
-     * @var \TYPO3\CMS\Core\Utility\File\ExtendedFileUtility
+     * @var ExtendedFileUtility
      */
     protected $fileProcessor;
 
     /**
-     * @var \TYPO3\CMS\Core\Resource\StorageRepository
+     * @var StorageRepository
      */
     protected $storageRepository;
 
@@ -74,10 +78,8 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
             'editfile' => [
                 [
                     'data' => 'testcontent_modified_directory',
-                    'target' => $this->getRootFolderIdentifier() . ltrim(
-                        self::FILE_IDENTIFIER_REFERENCED_IN_DIRECTORY,
-                        '/'
-                    )
+                    'target' => $this->getRootFolderIdentifier()
+                        . ltrim(self::FILE_IDENTIFIER_REFERENCED_IN_DIRECTORY, '/'),
                 ],
             ],
         ];
@@ -101,7 +103,7 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
             'editfile' => [
                 [
                     'data' => 'testcontent_modified',
-                    'target' => $this->getRootFolderIdentifier() . ltrim(self::FILE_IDENTIFIER_REFERENCED, '/')
+                    'target' => $this->getRootFolderIdentifier() . ltrim(self::FILE_IDENTIFIER_REFERENCED, '/'),
                 ],
             ],
         ];
@@ -127,14 +129,15 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
             'name' => basename(self::FILE_IDENTIFIER_REFERENCED),
             'type' => 'text/plain',
             'tmp_name' => PATH_site . 'typo3temp/uploadfiles/testfile_referenced.txt',
-            'size' => 31
+            'size' => 31,
         ];
 
         $fileValues = [
             'upload' => [
                 [
                     'data' => $uploadPosition,
-                    'target' => $this->getRootFolderIdentifier() . ltrim(dirname(self::FILE_IDENTIFIER_REFERENCED), '/')
+                    'target' => $this->getRootFolderIdentifier()
+                        . ltrim(dirname(self::FILE_IDENTIFIER_REFERENCED), '/'),
                 ],
             ],
         ];
@@ -146,7 +149,7 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
     /**
      * Returns the default storage.
      *
-     * @return \TYPO3\CMS\Core\Resource\ResourceStorage
+     * @return ResourceStorage
      */
     protected function getDefaultStorage()
     {

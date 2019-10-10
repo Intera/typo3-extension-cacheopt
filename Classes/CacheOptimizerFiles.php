@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Tx\Cacheopt;
 
 /*                                                                        *
@@ -11,7 +13,11 @@ namespace Tx\Cacheopt;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use InvalidArgumentException;
+use RuntimeException;
 use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\Folder;
@@ -36,7 +42,7 @@ class CacheOptimizerFiles implements SingletonInterface
     protected $cacheOptimizerRegistry;
 
     /**
-     * @var \TYPO3\CMS\Core\Database\DatabaseConnection
+     * @var DatabaseConnection
      */
     protected $databaseConnection;
 
@@ -54,9 +60,9 @@ class CacheOptimizerFiles implements SingletonInterface
      * @param FileInterface|File $file
      * @param Folder $targetFolder
      * @return void
-     * @throws \RuntimeException
-     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
-     * @throws \InvalidArgumentException
+     * @throws RuntimeException
+     * @throws NoSuchCacheGroupException
+     * @throws InvalidArgumentException
      */
     public function handleFileAddPost(
         /** @noinspection PhpUnusedParameterInspection */
@@ -78,9 +84,9 @@ class CacheOptimizerFiles implements SingletonInterface
      * @param FileInterface $file
      * @param Folder $targetFolder
      * @return void
-     * @throws \RuntimeException
-     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
-     * @throws \InvalidArgumentException
+     * @throws RuntimeException
+     * @throws NoSuchCacheGroupException
+     * @throws InvalidArgumentException
      */
     public function handleFileCopyPost(
         /** @noinspection PhpUnusedParameterInspection */
@@ -99,9 +105,9 @@ class CacheOptimizerFiles implements SingletonInterface
      * @param $newFileIdentifier
      * @param Folder $targetFolder
      * @return void
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws NoSuchCacheGroupException
      */
     public function handleFileCreatePost(
         /** @noinspection PhpUnusedParameterInspection */
@@ -119,9 +125,9 @@ class CacheOptimizerFiles implements SingletonInterface
      *
      * @param FileInterface $file
      * @return void
-     * @throws \RuntimeException
-     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
-     * @throws \InvalidArgumentException
+     * @throws RuntimeException
+     * @throws NoSuchCacheGroupException
+     * @throws InvalidArgumentException
      */
     public function handleFileDeletePost(FileInterface $file)
     {
@@ -140,9 +146,9 @@ class CacheOptimizerFiles implements SingletonInterface
      * @param Folder $targetFolder
      * @param Folder $originalFolder
      * @return void
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws NoSuchCacheGroupException
      */
     public function handleFileMovePost(
         FileInterface $file,
@@ -165,8 +171,8 @@ class CacheOptimizerFiles implements SingletonInterface
      * @param FileInterface $file
      * @param $targetFolder
      * @return void
-     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
-     * @throws \InvalidArgumentException
+     * @throws NoSuchCacheGroupException
+     * @throws InvalidArgumentException
      */
     public function handleFileRenamePost(
         FileInterface $file,
@@ -187,8 +193,8 @@ class CacheOptimizerFiles implements SingletonInterface
      * @param FileInterface $file
      * @param $localFilePath
      * @return void
-     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
-     * @throws \InvalidArgumentException
+     * @throws NoSuchCacheGroupException
+     * @throws InvalidArgumentException
      */
     public function handleFileReplacePost(
         $file,
@@ -209,8 +215,8 @@ class CacheOptimizerFiles implements SingletonInterface
      * @param FileInterface $file
      * @param $contents
      * @return void
-     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
-     * @throws \InvalidArgumentException
+     * @throws NoSuchCacheGroupException
+     * @throws InvalidArgumentException
      */
     public function handleFileSetContentsPost(
         FileInterface $file,
@@ -228,7 +234,7 @@ class CacheOptimizerFiles implements SingletonInterface
      * Clears the cache for all registered page UIDs.
      *
      * @return void
-     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
+     * @throws NoSuchCacheGroupException
      */
     protected function flushCacheForAllRegisteredTags()
     {
@@ -246,7 +252,7 @@ class CacheOptimizerFiles implements SingletonInterface
      * @param int $storageUid
      * @param string $folderIdentifier
      * @return void
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     protected function flushCacheForRelatedFolders($storageUid, $folderIdentifier)
     {
@@ -263,7 +269,7 @@ class CacheOptimizerFiles implements SingletonInterface
         );
         while ($fileCollectionRow = $this->databaseConnection->sql_fetch_assoc($fileCollectionResult)) {
             if (!is_array($fileCollectionRow)) {
-                throw new \RuntimeException('Database error while fetching file collections for folder.');
+                throw new RuntimeException('Database error while fetching file collections for folder.');
             }
             /** @var array $fileCollectionRow */
             $this->registerRecordForCacheFlushing('sys_file_collection', $fileCollectionRow['uid']);
@@ -274,7 +280,7 @@ class CacheOptimizerFiles implements SingletonInterface
      * Initializes all required classes.
      *
      * @return void
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function initialize()
     {

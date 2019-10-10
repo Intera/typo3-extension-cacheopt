@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Tx\Cacheopt\Tests\Functional;
 
 /*                                                                        *
@@ -11,6 +13,10 @@ namespace Tx\Cacheopt\Tests\Functional;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use FilesystemIterator;
+use RecursiveDirectoryIterator;
+use RuntimeException;
+use SplFileInfo;
 use TYPO3\CMS\Core\Tests\Functional\DataHandling\AbstractDataHandlerActionTestCase;
 
 /**
@@ -115,14 +121,14 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
     /**
      * Copies the files defined in $filesToCopyInTestInstance to the test instance.
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     protected function copyFilesToTestInstance()
     {
         foreach ($this->filesToCopyInTestInstance as $sourcePathToLinkInTestInstance => $destinationPathToLinkInTestInstance) {
             $sourcePath = ORIGINAL_ROOT . '/' . ltrim($sourcePathToLinkInTestInstance, '/');
             if (!file_exists($sourcePath)) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     'Path ' . $sourcePath . ' not found',
                     1376745645
                 );
@@ -130,7 +136,7 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
             $destinationPath = PATH_site . '/' . ltrim($destinationPathToLinkInTestInstance, '/');
             $success = copy($sourcePath, $destinationPath);
             if (!$success) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     'Can not copy the path ' . $sourcePath . ' to ' . $destinationPath,
                     1389969623
                 );
@@ -173,13 +179,13 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
     protected function loadDatabaseFixtures()
     {
         $fixtureDir = ORIGINAL_ROOT . 'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Database/';
-        $iteratorMode = \FilesystemIterator::UNIX_PATHS
-            | \FilesystemIterator::SKIP_DOTS
-            | \FilesystemIterator::CURRENT_AS_FILEINFO;
-        $iterator = new \RecursiveDirectoryIterator($fixtureDir, $iteratorMode);
+        $iteratorMode = FilesystemIterator::UNIX_PATHS
+            | FilesystemIterator::SKIP_DOTS
+            | FilesystemIterator::CURRENT_AS_FILEINFO;
+        $iterator = new RecursiveDirectoryIterator($fixtureDir, $iteratorMode);
 
         while ($iterator->valid()) {
-            /** @var $entry \SplFileInfo */
+            /** @var $entry SplFileInfo */
             $entry = $iterator->current();
             // Skip non-files/non-folders, and empty entries.
             if (!$entry->isFile() || $entry->isDir() || $entry->getFilename() === '') {

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Tx\Cacheopt;
 
 /*                                                                        *
@@ -11,6 +13,8 @@ namespace Tx\Cacheopt;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use InvalidArgumentException;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -34,7 +38,7 @@ class CacheOptimizerRegistry implements SingletonInterface
     protected $contentTypesByTable = [];
 
     /**
-     * @var \TYPO3\CMS\Core\Database\DatabaseConnection
+     * @var DatabaseConnection
      */
     protected $databaseConnection;
 
@@ -79,7 +83,7 @@ class CacheOptimizerRegistry implements SingletonInterface
      * Returns an instance of the CacheOptimizerRegistry.
      *
      * @return CacheOptimizerRegistry
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public static function getInstance()
     {
