@@ -157,7 +157,7 @@ abstract class CacheOptimizerTestAbstract extends FunctionalTestCase
                     1376745645
                 );
             }
-            $destinationPath = PATH_site . '/' . ltrim($destinationPathToLinkInTestInstance, '/');
+            $destinationPath = $this->instancePath . '/' . ltrim($destinationPathToLinkInTestInstance, '/');
             $success = copy($sourcePath, $destinationPath);
             if (!$success) {
                 throw new RuntimeException(

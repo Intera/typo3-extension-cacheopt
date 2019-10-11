@@ -14,7 +14,6 @@ namespace Tx\Cacheopt\Tests\Functional;
  *                                                                        */
 
 use Tx\Cacheopt\CacheOptimizerFiles;
-use Tx\Cacheopt\Tests\Functional\Mocks\ResourceStorageMock;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\ResourceStorage;

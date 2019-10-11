@@ -27,7 +27,7 @@ jobs:
       script: bash Build/Scripts/runTests.sh -s composerValidate -p $TRAVIS_PHP_VERSION
     - name: "PHP code sniffer"
       php: "7.3"
-      script: bash Build/Scripts/runCodeStyleChecks.sh
+      script: bash Build/Scripts/runCodeStyleChecks.sh PSRCacheopt
 
     - name: "Functional tests on MySQL PHP 7.2"
       php: "7.2"
