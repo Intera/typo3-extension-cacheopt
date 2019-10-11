@@ -149,7 +149,7 @@ class CacheOptimizerDataHandler
             return;
         }
 
-        if (count($orStatements === 1)) {
+        if (count($orStatements) === 1) {
             $queryBuilder->andWhere($orStatements[0]);
             return;
         }
