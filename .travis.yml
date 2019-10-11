@@ -1,73 +1,49 @@
 language: php
-sudo: false
 
-matrix:
-  include:
-    - php: 5.5
-      env: TYPO3_VERSION=^6.2
-    - php: 5.6
-      env: TYPO3_VERSION=^6.2
-    - php: 5.5
-      env: TYPO3_VERSION=^7.6
-    - php: 5.6
-      env: TYPO3_VERSION=^7.6
-    - php: 7
-      env: TYPO3_VERSION=^7.6
-    - php: 7
-      env: TYPO3_VERSION=^8
-    - php: 7
-      env: TYPO3_VERSION=dev-master
-  allow_failures:
-    - env: TYPO3_VERSION=dev-master
+env:
+  - TYPO3_EXTENSION_KEY=cacheopt
 
 cache:
   directories:
     - $HOME/.composer/cache
+    - $HOME/.cache/composer
 
-addons:
-  apt:
-    packages:
-      - parallel
+sudo: true
 
-cache:
-  directories:
-    - $HOME/.composer/cache
-
-before_install:
-  - phpenv config-rm xdebug.ini
-  - composer self-update
-  - composer --version
+stages:
+  - test
+  - name: deploy
+    if: tag
 
 before_script:
-  # Rename our working directory, required for Extension upload to TER.
-  - cd .. && mv typo3-extension-cacheopt cacheopt && cd cacheopt
-  # First we install all required packages as dist versions.
-  - composer require typo3/cms=$TYPO3_VERSION --prefer-dist
-  # Now remove the TYPO3 core and all related symlinks.
-  - rm .Build/vendor/typo3/cms -Rf
-  - rm -f .Build/Web/typo3
-  - rm -f .Build/Web/index.php
-  # Finally we install the TYPO3 core as source version because we need some functional
-  # test classes that are not included in the dist versions.
-  - composer require typo3/cms=$TYPO3_VERSION --prefer-source
-  - export TYPO3_PATH_WEB="$PWD/.Build/Web"
-  - mkdir -p $TYPO3_PATH_WEB/typo3conf/ext
-  - ln -s $PWD $TYPO3_PATH_WEB/typo3conf/ext/cacheopt
+  - if [ "$GITHUB_COMPOSER_AUTH" ]; then composer config -g github-oauth.github.com $GITHUB_COMPOSER_AUTH; fi
+  - bash Build/Scripts/runTests.sh -s composerInstall -p $TRAVIS_PHP_VERSION
 
-script:
-  - >
-    echo;
-    echo "Running phpcs";
-    .Build/bin/phpcs --config-set installed_paths "Tests/CodeSniffer,`pwd`/.Build/vendor/de-swebhosting/php-codestyle/PhpCodeSniffer";
-    .Build/bin/phpcs --standard=PSRCacheopt Classes Tests/Functional ext_localconf.php;
-  - >
-    echo;
-    echo "Running php lint";
-    find . -name \*.php ! -path "./.Build/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;
-  - >
-    echo;
-    export typo3DatabaseName="typo3";
-    export typo3DatabaseHost="localhost";
-    export typo3DatabaseUsername="root";
-    export typo3DatabasePassword="";
-    find Tests -wholename '*Tests/Functional/*Test.php' | parallel --gnu 'echo; echo "Running functional test suite {}"; ./.Build/bin/phpunit --colors -c .Build/Web/typo3/sysext/core/Build/FunctionalTests.xml {}'
+jobs:
+  include:
+    - stage: test
+      name: "Composer validate"
+      php: "7.3"
+      script: bash Build/Scripts/runTests.sh -s composerValidate -p $TRAVIS_PHP_VERSION
+    - name: "PHP code sniffer"
+      php: "7.3"
+      script: bash Build/Scripts/runCodeStyleChecks.sh
+
+    - name: "Functional tests on MySQL PHP 7.2"
+      php: "7.2"
+      script: bash Build/Scripts/runTests.sh -s functional -p $TRAVIS_PHP_VERSION
+    - name: "Functional tests on MySQL PHP 7.3"
+      php: "7.3"
+      script: bash Build/Scripts/runTests.sh -s functional -p $TRAVIS_PHP_VERSION
+
+    - name: "PHP linting PHP 7.2"
+      php: "7.2"
+      script: bash Build/Scripts/runTests.sh -s lint -p $TRAVIS_PHP_VERSION
+    - name: "PHP linting PHP 7.3"
+      php: "7.3"
+      script: bash Build/Scripts/runTests.sh -s lint -p $TRAVIS_PHP_VERSION
+
+    - stage: deploy
+      name: "Deploy to TER"
+      php: "7.3"
+      script: bash Build/Scripts/deployToTer.sh

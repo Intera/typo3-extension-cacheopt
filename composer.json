@@ -1,57 +1,59 @@
 {
-    "name": "intera-typo3-extension/cacheopt",
-    "description": "Optimizes automatic cache clearing.",
-    "type": "typo3-cms-extension",
-    "authors": [
-        {
-            "name": "Alexander Stehlik",
-            "email": "astehlik.deleteme@intera.de",
-            "role": "Developer",
-            "homepage": "http://www.intera.de"
-        }
-    ],
-    "license": "GPL-3.0+",
-    "require": {
-        "php": ">=5.5.0",
-        "typo3/cms-core": "^6.2 || ^7.6 || ^8.0"
-    },
-    "require-dev": {
-        "namelesscoder/typo3-repository-client": "^1.2.0",
-        "phpunit/phpunit": "~4.8.0",
-        "typo3-ter/gridelements": "*",
-        "squizlabs/php_codesniffer": "^2.7",
-        "de-swebhosting/php-codestyle": "dev-master"
-    },
-    "autoload": {
-        "psr-4": {
-            "Tx\\Cacheopt\\": "Classes/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Tx\\Cacheopt\\Tests\\": "Tests/",
-            "Tx\\CacheoptTest\\": "Tests/Functional/Fixtures/Extensions/cacheopt_test/Classes/",
-            "TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/core/Tests/"
-        }
-    },
-    "replace": {
-        "cacheopt": "self.version",
-        "typo3-ter/cacheopt": "self.version"
-    },
-    "config": {
-        "vendor-dir": ".Build/vendor",
-        "bin-dir": ".Build/bin"
-    },
-    "extra": {
-        "typo3/cms": {
-            "cms-package-dir": "{$vendor-dir}/typo3/cms",
-            "web-dir": ".Build/Web"
-        }
-    },
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://composer.typo3.org"
-        }
-    ]
+	"name": "intera-typo3-extension/cacheopt",
+	"type": "typo3-cms-extension",
+	"description": "Optimizes automatic cache clearing.",
+	"license": "GPL-3.0-or-later",
+	"authors": [
+		{
+			"name": "Alexander Stehlik",
+			"email": "astehlik.deleteme@intera.de",
+			"role": "Developer",
+			"homepage": "http://www.intera.de"
+		}
+	],
+	"require": {
+		"php": ">=7.2.0",
+		"typo3/cms-core": "^9.5"
+	},
+	"require-dev": {
+		"squizlabs/php_codesniffer": "^3.1",
+		"de-swebhosting/php-codestyle": "dev-master",
+		"typo3/cms-fluid-styled-content": "*",
+		"typo3/testing-framework": "^4.11",
+		"codeception/codeception": "^2.4",
+		"gridelementsteam/gridelements": "*"
+	},
+	"replace": {
+		"typo3-ter/cacheopt": "self.version"
+	},
+	"autoload": {
+		"psr-4": {
+			"Tx\\Cacheopt\\": "Classes/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"TYPO3\\JsonResponse\\": ".Build/vendor/typo3/testing-framework/Resources/Core/Functional/Extensions/json_response/Classes",
+			"TYPO3\\CMS\\Core\\Tests\\": ".Build/Web/typo3/sysext/core/Tests/",
+			"Tx\\Cacheopt\\Tests\\": "Tests/",
+			"Tx\\CacheoptTest\\": "Tests/Functional/Fixtures/Extensions/cacheopt_test/Classes/"
+		}
+	},
+	"config": {
+		"vendor-dir": ".Build/vendor",
+		"bin-dir": ".Build/bin"
+	},
+	"scripts": {
+		"post-autoload-dump": [
+			"TYPO3\\TestingFramework\\Composer\\ExtensionTestEnvironment::prepare",
+			"Tx\\Cacheopt\\Tests\\ExtensionTestEnvironment::prepare"
+		]
+	},
+	"extra": {
+		"typo3/cms": {
+			"app-dir": ".Build",
+			"web-dir": ".Build/Web",
+			"extension-key": "cacheopt"
+		}
+	}
 }

@@ -8,6 +8,7 @@ if (!defined('TYPO3_MODE')) {
 
 // Hook into the data handler to clear the cache for related records.
 // Make sure we are the first processor so that other processors handle the pages we added.
+/** @uses \Tx\Cacheopt\CacheOptimizerDataHandler::dataHandlerClearPageCacheEval() */
 if (isset($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['clearPageCacheEval'])
     && is_array($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['clearPageCacheEval'])
 ) {
@@ -55,9 +56,9 @@ $signalSlotDispatcher->connect(
     'handleFileDeletePost'
 );
 $signalSlotDispatcher->connect(
-    'TYPO3\\CMS\\Core\\Resource\\ResourceStorage',
+    TYPO3\CMS\Core\Resource\ResourceStorage::class,
     TYPO3\CMS\Core\Resource\ResourceStorage::SIGNAL_PostFileAdd,
-    'Tx\\Cacheopt\\CacheOptimizerFiles',
+    Tx\Cacheopt\CacheOptimizerFiles::class,
     'handleFileAddPost'
 );
 $signalSlotDispatcher->connect(

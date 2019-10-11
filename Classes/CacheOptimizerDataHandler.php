@@ -13,11 +13,15 @@ namespace Tx\Cacheopt;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Doctrine\DBAL\Connection;
 use InvalidArgumentException;
+use PDO;
 use RuntimeException;
-use TYPO3\CMS\Core\Database\DatabaseConnection;
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This cache optimizer hooks into the data handler to determine additional
@@ -36,11 +40,6 @@ class CacheOptimizerDataHandler
      * @var array
      */
     protected $currentPageIdArray;
-
-    /**
-     * @var DatabaseConnection
-     */
-    protected $databaseConnection;
 
     /**
      * @var ResourceFactory
@@ -91,18 +90,28 @@ class CacheOptimizerDataHandler
      * for which the cache is already flushed.
      *
      * @param bool $neverExcludeRoot If TRUE the TYPO3 root (pid = 0) will never be excluded.
-     * @return string
+     * @param QueryBuilder $queryBuilder
      */
-    protected function getPidExcludeStatement($neverExcludeRoot)
+    protected function getPidExcludeStatement($neverExcludeRoot, QueryBuilder $queryBuilder): void
     {
         $flushedCachePids = $this->cacheOptimizerRegistry->getFlushedCachePageUids();
-        if (count($flushedCachePids)) {
-            $query = ' AND (pid not IN (' . implode(',', $flushedCachePids) . ')';
-            $query .= $neverExcludeRoot ? ' OR pid=0)' : ')';
-            return $query;
-        } else {
-            return '';
+        if (count($flushedCachePids) === 0) {
+            return;
         }
+
+        $pidQuery = $queryBuilder->expr()->notIn(
+            'pid',
+            $queryBuilder->createNamedParameter($flushedCachePids, Connection::PARAM_INT_ARRAY)
+        );
+
+        if ($neverExcludeRoot) {
+            $pidQuery = $queryBuilder->expr()->orX(
+                $pidQuery,
+                $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter(0, PDO::PARAM_INT))
+            );
+        }
+
+        $queryBuilder->andWhere($pidQuery);
     }
 
     /**
@@ -110,39 +119,42 @@ class CacheOptimizerDataHandler
      * have a content type or a plugin type that is related to the given table.
      *
      * @param string $table
-     * @return string
-     * @throws InvalidArgumentException
+     * @param QueryBuilder $queryBuilder
      */
-    protected function getTtContentWhereStatementForTable($table)
+    protected function getTtContentWhereStatementForTable(string $table, QueryBuilder $queryBuilder): void
     {
         $this->initialize();
-        $whereStatement = '';
+        $orStatements = [];
 
         $contentTypesForTable = $this->cacheOptimizerRegistry->getContentTypesForTable($table);
-        if ($contentTypesForTable !== null) {
-            $whereStatement .= ' OR (tt_content.CType IN ('
-                . implode(
-                    ',',
-                    $this->databaseConnection->fullQuoteArray($contentTypesForTable, 'tt_content')
-                )
-                . '))';
+        if ($contentTypesForTable !== []) {
+            $orStatements[] = $queryBuilder->expr()->in(
+                'tt_content.CType',
+                $queryBuilder->createNamedParameter($contentTypesForTable, Connection::PARAM_STR_ARRAY)
+            );
         }
 
         $pluginTypesForTable = $this->cacheOptimizerRegistry->getPluginTypesForTable($table);
-        if ($pluginTypesForTable !== null) {
-            $whereStatement .= ' OR (tt_content.CType=\'list\' AND tt_content.list_type IN ('
-                . implode(
-                    ',',
-                    $this->databaseConnection->fullQuoteArray($pluginTypesForTable, 'tt_content')
+        if ($pluginTypesForTable !== []) {
+            $orStatements[] = $queryBuilder->expr()->andX(
+                $queryBuilder->expr()->eq('tt_content.CType', $queryBuilder->createNamedParameter('list')),
+                $queryBuilder->expr()->in(
+                    'tt_content.list_type',
+                    $queryBuilder->createNamedParameter($pluginTypesForTable, Connection::PARAM_STR_ARRAY)
                 )
-                . '))';
+            );
         }
 
-        if ($whereStatement !== '') {
-            $whereStatement = ' AND ( (1=2) ' . $whereStatement . ')';
+        if (count($orStatements === 0)) {
+            return;
         }
 
-        return $whereStatement;
+        if (count($orStatements === 1)) {
+            $queryBuilder->andWhere($orStatements[0]);
+            return;
+        }
+
+        $queryBuilder->andWhere($queryBuilder->expr()->orX(...$orStatements));
     }
 
     /**
@@ -153,10 +165,6 @@ class CacheOptimizerDataHandler
      */
     protected function initialize()
     {
-        if ($this->databaseConnection !== null) {
-            return;
-        }
-        $this->databaseConnection = $GLOBALS['TYPO3_DB'];
         $this->cacheOptimizerRegistry = CacheOptimizerRegistry::getInstance();
     }
 
@@ -167,7 +175,7 @@ class CacheOptimizerDataHandler
      * @param int $pid
      * @return void
      */
-    protected function registerPageForCacheFlush($pid)
+    protected function registerPageForCacheFlush(int $pid): void
     {
         if ($this->cacheOptimizerRegistry->pageCacheIsFlushed($pid)) {
             return;
@@ -187,24 +195,24 @@ class CacheOptimizerDataHandler
      */
     protected function registerRelatedPluginPagesForCacheFlush($table)
     {
-        $whereStatement = $this->getTtContentWhereStatementForTable($table);
-        if ($whereStatement === '') {
-            return;
+        $queryBuilder = $this->getQueryBuilderForTable('tt_content');
+        $queryBuilder->select('pid')
+            ->from('tt_content')
+            ->groupBy('pid');
+
+        $this->getPidExcludeStatement(false, $queryBuilder);
+        $this->getTtContentWhereStatementForTable($table, $queryBuilder);
+
+        $pageUidResult = $queryBuilder->execute();
+
+        while ($pageUid = (int)$pageUidResult->fetchColumn()) {
+            $this->registerPageForCacheFlush($pageUid);
         }
-        $pageUidQuery = $this->databaseConnection->SELECTquery(
-            'pid',
-            'tt_content',
-            '1=1' . $this->getPidExcludeStatement(false) . $whereStatement,
-            'pid'
-        );
-        $pageUidResult = $this->databaseConnection->sql_query($pageUidQuery);
-        while ($pageUidRow = $this->databaseConnection->sql_fetch_assoc($pageUidResult)) {
-            if (!is_array($pageUidRow)) {
-                throw new RuntimeException('Database error fechting related plugin pages.');
-            }
-            /** @var array $pageUidRow $pid */
-            $pid = $pageUidRow['pid'];
-            $this->registerPageForCacheFlush($pid);
-        }
+    }
+
+    private function getQueryBuilderForTable(string $tableName): QueryBuilder
+    {
+        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        return $connectionPool->getQueryBuilderForTable($tableName);
     }
 }

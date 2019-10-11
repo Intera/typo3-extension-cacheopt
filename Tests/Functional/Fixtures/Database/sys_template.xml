@@ -9,15 +9,15 @@
 		<title>root</title>
 		<root>1</root>
 		<clear>3</clear>
-		<include_static_file>EXT:css_styled_content/static/</include_static_file>
+		<include_static_file>EXT:fluid_styled_content/Configuration/TypoScript/</include_static_file>
 		<config>
 			<![CDATA[
-				<INCLUDE_TYPOSCRIPT: source="FILE: EXT:cacheopt/Tests/Functional/Fixtures/TypoScript/RootTemplateSetup.ts">
+				<INCLUDE_TYPOSCRIPT: source="FILE: EXT:cacheopt/Tests/Functional/Fixtures/TypoScript/RootTemplateSetup.typoscript">
 			]]>
 		</config>
 		<constants>
 			<![CDATA[
-				<INCLUDE_TYPOSCRIPT: source="FILE: EXT:cacheopt/Tests/Functional/Fixtures/TypoScript/RootTemplateConstants.ts">
+				<INCLUDE_TYPOSCRIPT: source="FILE: EXT:cacheopt/Tests/Functional/Fixtures/TypoScript/RootTemplateConstants.typoscript">
 			]]>
 		</constants>
 	</sys_template>

@@ -13,16 +13,24 @@ namespace Tx\Cacheopt\Tests\Functional;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Doctrine\DBAL\FetchMode;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RuntimeException;
 use SplFileInfo;
-use TYPO3\CMS\Core\Tests\Functional\DataHandling\AbstractDataHandlerActionTestCase;
+use Tx\Cacheopt\Tests\Functional\Mocks\ResourceStorageMock;
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Resource\ResourceStorage;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\TestingFramework\Core\Functional\Framework\DataHandling\ActionService;
+use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 /**
  * Base class for all functional tests of the cache optimizer.
  */
-abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestCase
+abstract class CacheOptimizerTestAbstract extends FunctionalTestCase
 {
     const PAGE_UID_REFERENCED_DIRECTORY = 131;
 
@@ -80,7 +88,11 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
      */
     public function setUp()
     {
-        $this->coreExtensionsToLoad[] = 'css_styled_content';
+        $this->coreExtensionsToLoad[] = 'fluid';
+        $this->coreExtensionsToLoad[] = 'fluid_styled_content';
+
+        $this->configurationToUseInTestInstance['SYS']['Objects'][ResourceStorage::class]['className']
+            = ResourceStorageMock::class;
 
         define('TX_CACHEOPT_FUNCTIONAL_TEST', true);
 
@@ -110,12 +122,24 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
      */
     protected function assertPageCacheIsFilled($pageUid)
     {
-        $cacheEntries = $this->getDatabaseConnection()->exec_SELECTgetRows(
-            'id',
-            'cf_cache_pages_tags',
-            'tag=\'pageId_' . $pageUid . '\''
-        );
-        $this->assertGreaterThanOrEqual(1, count($cacheEntries), 'Page cache for page ' . $pageUid . ' is not filled.');
+        $cacheTag = $this->buildPageCacheTag($pageUid);
+
+        $builder = $this->getQueryBuilderForSelect('cf_cache_pages_tags');
+        $entryCount = (int)$builder->count('id')
+            ->where($builder->expr()->eq('tag', $builder->createNamedParameter($cacheTag)))
+            ->execute()
+            ->fetchColumn(0);
+
+        $this->assertGreaterThanOrEqual(1, $entryCount, 'Page cache for page ' . $pageUid . ' is not filled.');
+    }
+
+    /**
+     * @param int $pageUid
+     * @return string
+     */
+    protected function buildPageCacheTag(int $pageUid): string
+    {
+        return 'pageId_' . $pageUid;
     }
 
     /**
@@ -155,6 +179,13 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
         $this->assertPageCacheIsFilled($pageUid);
     }
 
+    protected function getActionService(): ActionService
+    {
+        $this->setUpBackendUserFromFixture(1);
+        $GLOBALS['LANG'] = GeneralUtility::makeInstance(LanguageService::class);
+        return GeneralUtility::makeInstance(ActionService::class);
+    }
+
     /**
      * Retrieves one page cache record that belongs to the page with the given UID.
      *
@@ -163,14 +194,20 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
      */
     protected function getPageCacheRecords($pageUid)
     {
-        return $this->getDatabaseConnection()->exec_SELECTgetRows(
-            'cf_cache_pages.id',
-            'cf_cache_pages, cf_cache_pages_tags',
-            'cf_cache_pages.identifier=cf_cache_pages_tags.identifier AND tag=\'pageId_' . $pageUid . '\'',
-            '',
-            '',
-            1
-        );
+        $cacheTag = $this->buildPageCacheTag($pageUid);
+
+        $builder = $this->getQueryBuilderForSelect('cf_cache_pages');
+        $builder->select('cf_cache_pages.id')
+            ->from('cf_cache_pages_tags')
+            ->where(
+                $builder->expr()->eq(
+                    'cf_cache_pages.identifier',
+                    $builder->quoteIdentifier('cf_cache_pages_tags.identifier')
+                )
+            )
+            ->andWhere($builder->expr()->eq('tag', $builder->createNamedParameter($cacheTag)));
+
+        return $builder->execute()->fetchAll(FetchMode::ASSOCIATIVE);
     }
 
     /**
@@ -195,5 +232,13 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
             $this->importDataSet($entry->getPathname());
             $iterator->next();
         }
+    }
+
+    private function getQueryBuilderForSelect(string $table): QueryBuilder
+    {
+        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $builder = $connectionPool->getQueryBuilderForTable($table);
+        $builder->from($table);
+        return $builder;
     }
 }
