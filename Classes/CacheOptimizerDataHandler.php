@@ -195,6 +195,10 @@ class CacheOptimizerDataHandler
      */
     protected function registerRelatedPluginPagesForCacheFlush($table)
     {
+        if (!$this->cacheOptimizerRegistry->isRegisteredPluginTable($table)) {
+            return;
+        }
+
         $queryBuilder = $this->getQueryBuilderForTable('tt_content');
         $queryBuilder->select('pid')
             ->from('tt_content')

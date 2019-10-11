@@ -156,6 +156,15 @@ class CacheOptimizerRegistry implements SingletonInterface
         return isset($this->processedRecords[$table][(int)$uid]);
     }
 
+    public function isRegisteredPluginTable(string $table): bool
+    {
+        if ($this->getContentTypesForTable($table) !== []) {
+            return true;
+        }
+
+        return $this->getPluginTypesForTable($table) !== [];
+    }
+
     /**
      * Returns TRUE if the cache for the page with the given UID was already flushed.
      *
