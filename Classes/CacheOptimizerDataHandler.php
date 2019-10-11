@@ -145,7 +145,7 @@ class CacheOptimizerDataHandler
             );
         }
 
-        if (count($orStatements === 0)) {
+        if (count($orStatements) === 0) {
             return;
         }
 
