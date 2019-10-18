@@ -17,7 +17,7 @@ stages:
 
 before_script:
   - if [ "$GITHUB_COMPOSER_AUTH" ]; then composer config -g github-oauth.github.com $GITHUB_COMPOSER_AUTH; fi
-  - bash .Build/bin/t3_run_tests.sh -s composerInstall -p $TRAVIS_PHP_VERSION
+  - composer install
 
 jobs:
   include:
