@@ -255,9 +255,7 @@ abstract class CacheOptimizerTestAbstract extends FunctionalTestCase
                     'cacheConfigurations' => [
                         'pages' => [
                             'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\Typo3DatabaseBackend',
-                            'options' => [
-                                'compression' => 1,
-                            ],
+                            'options' => ['compression' => 1],
                         ],
                     ],
                 ],
