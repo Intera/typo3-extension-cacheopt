@@ -5,12 +5,14 @@ if (!defined('TYPO3_MODE')) {
     die('Access denied.');
 }
 
+/** @uses \Tx\CacheoptTest\Controller\RecordController::displayAction() */
 TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
     'Tx.CacheoptTest',
     'RecordRenderPlugin',
     ['Record' => 'display']
 );
 
+/** @uses \Tx\CacheoptTest\Controller\RecordController::displayAction() */
 TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
     'Tx.CacheoptTest',
     'RecordRenderContent',

@@ -97,13 +97,13 @@ class CacheOptimizerRegistry implements SingletonInterface
      * @param string $table
      * @return array
      */
-    public function getContentTypesForTable($table)
+    public function getContentTypesForTable($table): array
     {
-        if (array_key_exists($table, $this->contentTypesByTable)) {
-            return $this->contentTypesByTable[$table];
-        } else {
-            return null;
+        if (!array_key_exists($table, $this->contentTypesByTable)) {
+            return [];
         }
+
+        return $this->contentTypesByTable[$table];
     }
 
     /**
@@ -123,13 +123,13 @@ class CacheOptimizerRegistry implements SingletonInterface
      * @param string $table
      * @return array
      */
-    public function getPluginTypesForTable($table)
+    public function getPluginTypesForTable($table): array
     {
-        if (array_key_exists($table, $this->pluginTypesByTable)) {
-            return $this->pluginTypesByTable[$table];
-        } else {
-            return null;
+        if (!array_key_exists($table, $this->pluginTypesByTable)) {
+            return [];
         }
+
+        return $this->pluginTypesByTable[$table];
     }
 
     /**
@@ -154,6 +154,15 @@ class CacheOptimizerRegistry implements SingletonInterface
     public function isProcessedRecord($table, $uid)
     {
         return isset($this->processedRecords[$table][(int)$uid]);
+    }
+
+    public function isRegisteredPluginTable(string $table): bool
+    {
+        if ($this->getContentTypesForTable($table) !== []) {
+            return true;
+        }
+
+        return $this->getPluginTypesForTable($table) !== [];
     }
 
     /**

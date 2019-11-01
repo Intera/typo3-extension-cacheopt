@@ -14,7 +14,7 @@ namespace Tx\Cacheopt\Tests\Functional;
  *                                                                        */
 
 use Tx\Cacheopt\CacheOptimizerFiles;
-use Tx\Cacheopt\Tests\Functional\Mocks\ResourceStorageMock;
+use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Resource\StorageRepository;
@@ -55,10 +55,13 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
     public function setUp()
     {
         parent::setUp();
-        $this->storageRepository = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\StorageRepository');
-        $this->fileProcessor = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Utility\\File\\ExtendedFileUtility');
-        $this->cacheOptimizerFiles = GeneralUtility::makeInstance('Tx\\Cacheopt\\CacheOptimizerFiles');
+        $this->storageRepository = GeneralUtility::makeInstance(StorageRepository::class);
+        $this->fileProcessor = GeneralUtility::makeInstance(ExtendedFileUtility::class);
+        $this->cacheOptimizerFiles = GeneralUtility::makeInstance(CacheOptimizerFiles::class);
         $this->initFileProcessor();
+
+        $this->setUpBackendUserFromFixture(1);
+        $GLOBALS['LANG'] = GeneralUtility::makeInstance(LanguageService::class);
     }
 
     /**
@@ -120,8 +123,6 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
      */
     public function fileUploadClearsCacheOfPageWhereOverwrittenFileIsReferenced()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][ResourceStorage::class]['className'] = ResourceStorageMock::class;
-
         $this->fillPageCache(self::PAGE_UID_REFERENCED_FILE);
 
         $uploadPosition = 'file1';
@@ -173,14 +174,7 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
      */
     protected function initFileProcessor()
     {
-        if (method_exists($this->fileProcessor, 'init')) {
-            $this->fileProcessor->init([], $GLOBALS['TYPO3_CONF_VARS']['BE']['fileExtensions']);
-        }
-        if (method_exists($this->fileProcessor, 'setExistingFilesConflictMode')) {
-            $this->fileProcessor->setExistingFilesConflictMode(DuplicationBehavior::REPLACE);
-        } else {
-            $this->fileProcessor->dontCheckForUnique = 1;
-        }
+        $this->fileProcessor->setExistingFilesConflictMode(DuplicationBehavior::REPLACE);
     }
 
     /**

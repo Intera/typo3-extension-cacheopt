@@ -11,7 +11,6 @@
 		<workspace_perms>1</workspace_perms>
 		<disableIPlock>1</disableIPlock>
 		<lastlogin>1371033743</lastlogin>
-		<workspace_preview>1</workspace_preview>
 	</be_users>
 	<be_users>
 		<uid>4</uid>
@@ -24,7 +23,6 @@
 		<workspace_perms>1</workspace_perms>
 		<disableIPlock>1</disableIPlock>
 		<lastlogin>1371033743</lastlogin>
-		<workspace_preview>1</workspace_preview>
 	</be_users>
 	<be_users>
 		<uid>5</uid>
@@ -37,6 +35,5 @@
 		<workspace_perms>1</workspace_perms>
 		<disableIPlock>1</disableIPlock>
 		<lastlogin>1371033743</lastlogin>
-		<workspace_preview>1</workspace_preview>
 	</be_users>
 </dataset>

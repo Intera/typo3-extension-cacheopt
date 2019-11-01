@@ -14,10 +14,12 @@ namespace Tx\Cacheopt;
  *                                                                        */
 
 use InvalidArgumentException;
+use PDO;
 use RuntimeException;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
-use TYPO3\CMS\Core\Database\DatabaseConnection;
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\Folder;
@@ -31,7 +33,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class CacheOptimizerFiles implements SingletonInterface
 {
     /**
-     *
      * @var CacheManager
      */
     protected $cacheManager;
@@ -40,11 +41,6 @@ class CacheOptimizerFiles implements SingletonInterface
      * @var CacheOptimizerRegistry
      */
     protected $cacheOptimizerRegistry;
-
-    /**
-     * @var DatabaseConnection
-     */
-    protected $databaseConnection;
 
     /**
      * Array containing all page UIDs for which the cache should be cleared.
@@ -251,28 +247,26 @@ class CacheOptimizerFiles implements SingletonInterface
      *
      * @param int $storageUid
      * @param string $folderIdentifier
-     * @return void
-     * @throws RuntimeException
      */
-    protected function flushCacheForRelatedFolders($storageUid, $folderIdentifier)
+    protected function flushCacheForRelatedFolders(int $storageUid, string $folderIdentifier): void
     {
         if ($this->cacheOptimizerRegistry->isProcessedFolder($storageUid, $folderIdentifier)) {
             return;
         }
+
         $this->cacheOptimizerRegistry->registerProcessedFolder($storageUid, $folderIdentifier);
-        $fileCollectionResult = $this->databaseConnection->exec_SELECTquery(
-            'uid',
-            'sys_file_collection',
-            "deleted=0 AND type='folder' AND storage="
-            . (int)$storageUid . ' AND folder='
-            . $this->databaseConnection->fullQuoteStr($folderIdentifier, 'sys_file_collection')
-        );
-        while ($fileCollectionRow = $this->databaseConnection->sql_fetch_assoc($fileCollectionResult)) {
-            if (!is_array($fileCollectionRow)) {
-                throw new RuntimeException('Database error while fetching file collections for folder.');
-            }
-            /** @var array $fileCollectionRow */
-            $this->registerRecordForCacheFlushing('sys_file_collection', $fileCollectionRow['uid']);
+
+        $queryBuilder = $this->getQueryBuilderForTable('sys_file_collection');
+        $queryBuilder->select('uid')
+            ->from('sys_file_collection')
+            ->where($queryBuilder->expr()->eq('deleted', 0))
+            ->andWhere('type', 'folder')
+            ->andWhere('storage', $queryBuilder->createNamedParameter($storageUid, PDO::PARAM_INT))
+            ->andWhere('folder', $queryBuilder->createNamedParameter($folderIdentifier));
+
+        $fileCollectionResult = $queryBuilder->execute();
+        while ($fileCollectionUid = (int)$fileCollectionResult->fetchColumn()) {
+            $this->registerRecordForCacheFlushing('sys_file_collection', $fileCollectionUid);
         }
     }
 
@@ -284,12 +278,12 @@ class CacheOptimizerFiles implements SingletonInterface
      */
     protected function initialize()
     {
-        if ($this->databaseConnection !== null) {
+        if ($this->cacheOptimizerRegistry) {
             return;
         }
+
         $this->cacheOptimizerRegistry = GeneralUtility::makeInstance(CacheOptimizerRegistry::class);
         $this->cacheManager = GeneralUtility::makeInstance(CacheManager::class);
-        $this->databaseConnection = $GLOBALS['TYPO3_DB'];
     }
 
     /**
@@ -316,5 +310,11 @@ class CacheOptimizerFiles implements SingletonInterface
         }
         $this->cacheOptimizerRegistry->registerProcessedRecord($table, $uid);
         $this->flushCacheTags[] = $table . '_' . $uid;
+    }
+
+    private function getQueryBuilderForTable(string $tableName): QueryBuilder
+    {
+        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        return $connectionPool->getQueryBuilderForTable($tableName);
     }
 }
