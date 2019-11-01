@@ -28,7 +28,7 @@ jobs:
       script: bash .Build/bin/t3_run_tests.sh -s composerValidate -p $TRAVIS_PHP_VERSION
     - name: "PHP code sniffer"
       php: "7.3"
-      script: bash .Build/bin/t3_check_codestyle.sh [your_custom_codestyle]
+      script: bash .Build/bin/t3_check_codestyle.sh PSRCacheopt
 
     - name: "Functional tests on MySQL PHP 7.2"
       php: "7.2"
