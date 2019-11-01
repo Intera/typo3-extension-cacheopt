@@ -1,20 +1,12 @@
-﻿.. ==================================================
-.. FOR YOUR INFORMATION
-.. --------------------------------------------------
-.. -*- coding: utf-8 -*- with BOM.
-
-.. include:: ../Includes.txt
+﻿.. include:: ../Includes.txt
 
 
-.. _admin-manual:
 
-Administrator Manual
-====================
+.. _installation:
 
-.. _admin-installation:
-
+============
 Installation
-------------
+============
 
 Import the extension in the extension manager and install it.
 
@@ -29,7 +21,7 @@ is included for:
 
 If you have additional Extensions that are not supported yet you can:
 
-- Look at the section :ref:`developers-guide` to see how you can configure additional Extensions.
+- Look at the section :ref:`developer` to see how you can configure additional Extensions.
 - Open an `issue on Github`_ and request the Extension to be included in the default configuration.
 
 .. _issue on Github: https://github.com/Intera/typo3-extension-cacheopt/issues/
