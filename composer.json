@@ -16,12 +16,9 @@
 		"typo3/cms-core": "^9.5"
 	},
 	"require-dev": {
-		"squizlabs/php_codesniffer": "^3.1",
-		"de-swebhosting/php-codestyle": "dev-master",
 		"typo3/cms-fluid-styled-content": "*",
-		"typo3/testing-framework": "^4.11",
-		"codeception/codeception": "^2.4",
-		"gridelementsteam/gridelements": "*"
+		"gridelementsteam/gridelements": "*",
+		"de-swebhosting/typo3-extension-buildtools": "dev-TYPO3_9"
 	},
 	"replace": {
 		"typo3-ter/cacheopt": "self.version"
