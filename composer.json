@@ -35,7 +35,6 @@
         }
     },
     "replace": {
-        "cacheopt": "self.version",
         "typo3-ter/cacheopt": "self.version"
     },
     "config": {
