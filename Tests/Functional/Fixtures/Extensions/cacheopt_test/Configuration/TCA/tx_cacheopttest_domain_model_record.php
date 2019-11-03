@@ -7,11 +7,11 @@ return [
         'cruser_id' => 'cruser_id',
         'title' => 'Cacheopt record',
         'delete' => 'deleted',
-        'searchFields' => 'title'
+        'searchFields' => 'title',
     ],
     'interface' => [
         'always_description' => 0,
-        'showRecordFieldList' => 'title'
+        'showRecordFieldList' => 'title',
     ],
     'columns' => [
         'title' => [
@@ -21,13 +21,11 @@ return [
                 'eval' => 'required',
                 'size' => '50',
                 'max' => '256'
-            ]
+            ],
         ],
     ],
     'types' => [
-        '0' => [
-            'showitem' => 'title'
-        ],
+        '0' => ['showitem' => 'title'],
     ],
     'palettes' => [],
 ];

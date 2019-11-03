@@ -77,7 +77,7 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
                     'target' => $this->getRootFolderIdentifier() . ltrim(
                         self::FILE_IDENTIFIER_REFERENCED_IN_DIRECTORY,
                         '/'
-                    )
+                    ),
                 ],
             ],
         ];
@@ -101,7 +101,7 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
             'editfile' => [
                 [
                     'data' => 'testcontent_modified',
-                    'target' => $this->getRootFolderIdentifier() . ltrim(self::FILE_IDENTIFIER_REFERENCED, '/')
+                    'target' => $this->getRootFolderIdentifier() . ltrim(self::FILE_IDENTIFIER_REFERENCED, '/'),
                 ],
             ],
         ];
@@ -134,7 +134,8 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
             'upload' => [
                 [
                     'data' => $uploadPosition,
-                    'target' => $this->getRootFolderIdentifier() . ltrim(dirname(self::FILE_IDENTIFIER_REFERENCED), '/')
+                    'target' => $this->getRootFolderIdentifier()
+                        . ltrim(dirname(self::FILE_IDENTIFIER_REFERENCED), '/'),
                 ],
             ],
         ];
