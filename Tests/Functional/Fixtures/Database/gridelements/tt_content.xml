@@ -13,6 +13,7 @@
 		<header>2ColumnGrid 1</header>
 		<colPos>0</colPos>
 		<sectionIndex>1</sectionIndex>
+		<filelink_sorting/>
 	</tt_content>
 	<tt_content>
 		<uid>2211</uid>
@@ -27,6 +28,7 @@
 		<header>2ColumnGrid 2</header>
 		<colPos>0</colPos>
 		<sectionIndex>1</sectionIndex>
+		<filelink_sorting/>
 	</tt_content>
 	<tt_content>
 		<uid>21111</uid>
@@ -40,6 +42,7 @@
 		<colPos>-1</colPos>
 		<tx_gridelements_container>2111</tx_gridelements_container>
 		<sectionIndex>1</sectionIndex>
+		<filelink_sorting/>
 	</tt_content>
 	<tt_content>
 		<uid>22111</uid>
@@ -54,5 +57,6 @@
 		<colPos>-1</colPos>
 		<tx_gridelements_container>2211</tx_gridelements_container>
 		<sectionIndex>1</sectionIndex>
+		<filelink_sorting/>
 	</tt_content>
 </dataset>
