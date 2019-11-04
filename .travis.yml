@@ -9,6 +9,10 @@ matrix:
       env: TYPO3_VERSION=^7.6
     - php: 7.1
       env: TYPO3_VERSION=^7.6
+    - php: 7.2
+      env: TYPO3_VERSION=^8.7
+    - php: 7.3
+      env: TYPO3_VERSION=^8.7
 
 cache:
   directories:
@@ -30,10 +34,8 @@ before_install:
 
 before_script:
   # First we install all required packages as dist versions.
-  - composer require typo3/cms=$TYPO3_VERSION --prefer-dist
+  - composer require typo3/cms=$TYPO3_VERSION  --prefer-dist
   - export TYPO3_PATH_WEB="$PWD/.Build/Web"
-  - mkdir -p $TYPO3_PATH_WEB/typo3conf/ext
-  - ln -s $PWD $TYPO3_PATH_WEB/typo3conf/ext/cacheopt
 
 script:
   - >

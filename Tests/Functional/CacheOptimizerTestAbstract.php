@@ -12,16 +12,15 @@ namespace Tx\Cacheopt\Tests\Functional;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use FilesystemIterator;
+use DirectoryIterator;
 use Nimut\TestingFramework\TestCase\FunctionalTestCase;
-use RecursiveDirectoryIterator;
 use RuntimeException;
 use SplFileInfo;
-use stdClass;
 use Tx\Cacheopt\Tests\Functional\Fixtures\NonCacheClearingFrontendController;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Lang\LanguageService;
 
@@ -209,17 +208,27 @@ abstract class CacheOptimizerTestAbstract extends FunctionalTestCase
      */
     protected function getPageCacheRecords($pageUid)
     {
-        $row = $this->getDatabaseConnection()->selectSingleRow(
-            'cf_cache_pages.id',
-            'cf_cache_pages, cf_cache_pages_tags',
-            'cf_cache_pages.identifier=cf_cache_pages_tags.identifier AND tag=\'pageId_' . $pageUid . '\''
+        $tagRow = $this->getDatabaseConnection()->selectSingleRow(
+            'identifier',
+            'cf_cache_pages_tags',
+            'tag=\'pageId_' . $pageUid . '\''
         );
 
-        if (!$row) {
+        if (!$tagRow) {
             return [];
         }
 
-        return [$row];
+        $cacheRow = $this->getDatabaseConnection()->selectSingleRow(
+            'id',
+            'cf_cache_pages',
+            'cf_cache_pages.identifier=\'pageId_' . $tagRow['identifier'] . '\''
+        );
+
+        if (!$cacheRow) {
+            return [];
+        }
+
+        return [$cacheRow];
     }
 
     /**
@@ -228,10 +237,7 @@ abstract class CacheOptimizerTestAbstract extends FunctionalTestCase
     protected function loadDatabaseFixtures()
     {
         $fixtureDir = ORIGINAL_ROOT . 'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Database/';
-        $iteratorMode = FilesystemIterator::UNIX_PATHS
-            | FilesystemIterator::SKIP_DOTS
-            | FilesystemIterator::CURRENT_AS_FILEINFO;
-        $iterator = new RecursiveDirectoryIterator($fixtureDir, $iteratorMode);
+        $iterator = new DirectoryIterator($fixtureDir);
 
         while ($iterator->valid()) {
             /** @var $entry SplFileInfo */
@@ -244,6 +250,16 @@ abstract class CacheOptimizerTestAbstract extends FunctionalTestCase
             $this->importDataSet($entry->getPathname());
             $iterator->next();
         }
+
+        $versionSuffix = 7;
+        if ($this->isTypo3Version8()) {
+            $versionSuffix = 8;
+        }
+
+        $filename = sprintf('typo3_%d.xml', $versionSuffix);
+        $this->importDataSet(
+            ORIGINAL_ROOT . 'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Database/menu_content/' . $filename
+        );
     }
 
     /**
@@ -256,5 +272,13 @@ abstract class CacheOptimizerTestAbstract extends FunctionalTestCase
             $dataHandler->copyTree = $GLOBALS['BE_USER']->uc['copyLevels'];
         }
         return $dataHandler;
+    }
+
+    /**
+     * @return bool
+     */
+    private function isTypo3Version8()
+    {
+        return VersionNumberUtility::convertVersionNumberToInteger(TYPO3_branch) >= 8000000;
     }
 }

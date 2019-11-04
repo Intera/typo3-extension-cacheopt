@@ -13,7 +13,7 @@ $EM_CONF[$_EXTKEY] = [
     'author_email' => 'astehlik.deleteme@intera.de',
     'author_company' => 'Intera GmbH',
     'constraints' => [
-        'depends' => ['typo3' => '6.2.1-7.6.99'],
+        'depends' => ['typo3' => '6.2.1-8.7.99'],
         'conflicts' => [],
         'suggests' => [],
     ],
