@@ -12,6 +12,7 @@
 		<media>1</media>
 		<colPos>0</colPos>
 		<sectionIndex>1</sectionIndex>
+		<filelink_sorting/>
 	</tt_content>
 	<tt_content>
 		<uid>90</uid>
@@ -25,6 +26,7 @@
 		<colPos>0</colPos>
 		<sectionIndex>1</sectionIndex>
 		<file_collections>1</file_collections>
+		<filelink_sorting/>
 	</tt_content>
 	<tt_content>
 		<uid>900</uid>
@@ -38,6 +40,7 @@
 		<records>90</records>
 		<colPos>0</colPos>
 		<sectionIndex>1</sectionIndex>
+		<filelink_sorting/>
 	</tt_content>
 	<tt_content>
 		<uid>91</uid>
@@ -53,6 +56,7 @@
 		<pages>132,139</pages>
 		<menu_type>0</menu_type>
 		<sectionIndex>1</sectionIndex>
+		<filelink_sorting/>
 	</tt_content>
 	<tt_content>
 		<uid>92</uid>
@@ -66,6 +70,7 @@
 		<colPos>0</colPos>
 		<list_type>cacheopttest_recordrenderplugin</list_type>
 		<sectionIndex>1</sectionIndex>
+		<filelink_sorting/>
 	</tt_content>
 	<tt_content>
 		<uid>93</uid>
@@ -78,6 +83,7 @@
 		<header>cacheopt_record_renderer_test_content</header>
 		<colPos>0</colPos>
 		<sectionIndex>1</sectionIndex>
+		<filelink_sorting/>
 	</tt_content>
 	<tt_content>
 		<uid>94</uid>
@@ -90,6 +96,7 @@
 		<header>simple_content</header>
 		<colPos>0</colPos>
 		<sectionIndex>1</sectionIndex>
+		<filelink_sorting/>
 	</tt_content>
 	<tt_content>
 		<uid>95</uid>
@@ -102,6 +109,7 @@
 		<header>referenced_content</header>
 		<colPos>0</colPos>
 		<sectionIndex>1</sectionIndex>
+		<filelink_sorting/>
 	</tt_content>
 	<tt_content>
 		<uid>96</uid>
@@ -115,6 +123,7 @@
 		<records>95</records>
 		<colPos>0</colPos>
 		<sectionIndex>1</sectionIndex>
+		<filelink_sorting/>
 	</tt_content>
 	<tt_content>
 		<uid>97</uid>
@@ -130,5 +139,6 @@
 		<pages>132</pages>
 		<menu_type>0</menu_type>
 		<sectionIndex>1</sectionIndex>
+		<filelink_sorting/>
 	</tt_content>
 </dataset>
