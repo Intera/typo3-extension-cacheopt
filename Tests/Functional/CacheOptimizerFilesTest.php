@@ -52,7 +52,7 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
     /**
      * Initializes required classes.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->storageRepository = GeneralUtility::makeInstance(StorageRepository::class);
@@ -129,7 +129,7 @@ class CacheOptimizerFilesTest extends CacheOptimizerTestAbstract
         $_FILES['upload_' . $uploadPosition] = [
             'name' => basename(self::FILE_IDENTIFIER_REFERENCED),
             'type' => 'text/plain',
-            'tmp_name' => PATH_site . 'typo3temp/uploadfiles/testfile_referenced.txt',
+            'tmp_name' => $this->instancePath . '/typo3temp/uploadfiles/testfile_referenced.txt',
             'size' => 31,
         ];
 

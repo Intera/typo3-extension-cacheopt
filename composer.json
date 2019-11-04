@@ -12,13 +12,12 @@
 		}
 	],
 	"require": {
-		"php": ">=7.2.0",
-		"typo3/cms-core": "^9.5"
+		"php": "^7.2",
+		"typo3/cms-core": "^10.0"
 	},
 	"require-dev": {
 		"typo3/cms-fluid-styled-content": "*",
-		"gridelementsteam/gridelements": "*",
-		"de-swebhosting/typo3-extension-buildtools": "dev-TYPO3_9"
+		"de-swebhosting/typo3-extension-buildtools": "dev-master"
 	},
 	"replace": {
 		"typo3-ter/cacheopt": "self.version"

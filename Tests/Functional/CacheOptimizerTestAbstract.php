@@ -19,6 +19,7 @@ use RecursiveDirectoryIterator;
 use RuntimeException;
 use SplFileInfo;
 use Tx\Cacheopt\Tests\Functional\Mocks\ResourceStorageMock;
+use Tx\Cacheopt\Tests\Functional\Support\SiteBasedTestTrait;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Localization\LanguageService;
@@ -32,6 +33,8 @@ use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
  */
 abstract class CacheOptimizerTestAbstract extends FunctionalTestCase
 {
+    use SiteBasedTestTrait;
+
     const PAGE_UID_REFERENCED_DIRECTORY = 131;
 
     const PAGE_UID_REFERENCED_FILE = 130;
@@ -86,13 +89,18 @@ abstract class CacheOptimizerTestAbstract extends FunctionalTestCase
     /**
      * Sets up the test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->coreExtensionsToLoad[] = 'fluid';
         $this->coreExtensionsToLoad[] = 'fluid_styled_content';
 
         $this->configurationToUseInTestInstance['SYS']['Objects'][ResourceStorage::class]['className']
             = ResourceStorageMock::class;
+
+        $this->configurationToUseInTestInstance = array_merge_recursive(
+            $this->configurationToUseInTestInstance,
+            $this->buildDatabaseCacheConfig()
+        );
 
         define('TX_CACHEOPT_FUNCTIONAL_TEST', true);
 
@@ -102,6 +110,11 @@ abstract class CacheOptimizerTestAbstract extends FunctionalTestCase
 
         $this->loadDatabaseFixtures();
         $this->copyFilesToTestInstance();
+
+        $this->writeSiteConfiguration(
+            'website-local',
+            $this->buildSiteConfiguration(128, 'https://website.local/')
+        );
     }
 
     /**
@@ -124,7 +137,7 @@ abstract class CacheOptimizerTestAbstract extends FunctionalTestCase
     {
         $cacheTag = $this->buildPageCacheTag($pageUid);
 
-        $builder = $this->getQueryBuilderForSelect('cf_cache_pages_tags');
+        $builder = $this->getQueryBuilderForSelect('cache_pages_tags');
         $entryCount = (int)$builder->count('id')
             ->where($builder->expr()->eq('tag', $builder->createNamedParameter($cacheTag)))
             ->execute()
@@ -196,13 +209,13 @@ abstract class CacheOptimizerTestAbstract extends FunctionalTestCase
     {
         $cacheTag = $this->buildPageCacheTag($pageUid);
 
-        $builder = $this->getQueryBuilderForSelect('cf_cache_pages');
-        $builder->select('cf_cache_pages.id')
-            ->from('cf_cache_pages_tags')
+        $builder = $this->getQueryBuilderForSelect('cache_pages');
+        $builder->select('cache_pages.id')
+            ->from('cache_pages_tags')
             ->where(
                 $builder->expr()->eq(
-                    'cf_cache_pages.identifier',
-                    $builder->quoteIdentifier('cf_cache_pages_tags.identifier')
+                    'cache_pages.identifier',
+                    $builder->quoteIdentifier('cache_pages_tags.identifier')
                 )
             )
             ->andWhere($builder->expr()->eq('tag', $builder->createNamedParameter($cacheTag)));
@@ -232,6 +245,22 @@ abstract class CacheOptimizerTestAbstract extends FunctionalTestCase
             $this->importDataSet($entry->getPathname());
             $iterator->next();
         }
+    }
+
+    private function buildDatabaseCacheConfig()
+    {
+        return [
+            'SYS' => [
+                'caching' => [
+                    'cacheConfigurations' => [
+                        'pages' => [
+                            'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\Typo3DatabaseBackend',
+                            'options' => ['compression' => 1],
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 
     private function getQueryBuilderForSelect(string $table): QueryBuilder
