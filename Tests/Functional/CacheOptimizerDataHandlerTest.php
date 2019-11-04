@@ -52,7 +52,7 @@ class CacheOptimizerTest extends CacheOptimizerTestAbstract
     public function contentChangeClearsCacheForContainingPage()
     {
         $this->fillPageCache(self::PAGE_UID_NORMAL);
-        $this->actionService->modifyRecord(
+        $this->modifyRecord(
             'tt_content',
             self::CONTENT_UID_SIMPLE,
             ['header' => 'referenced_content_mod']
@@ -69,7 +69,7 @@ class CacheOptimizerTest extends CacheOptimizerTestAbstract
     public function contentChangeClearsCacheForRelatedRecordContents()
     {
         $this->fillPageCache(self::PAGE_UID_REFERENCING_CONTENT);
-        $this->actionService->modifyRecord(
+        $this->modifyRecord(
             'tt_content',
             self::CONTENT_UID_REFERENCED,
             ['header' => 'referencing_content_mod']
@@ -87,7 +87,7 @@ class CacheOptimizerTest extends CacheOptimizerTestAbstract
     public function fileMetadataChangeClearsCacheForPagesReferencingToTheDirectory()
     {
         $this->fillPageCache(self::PAGE_UID_REFERENCED_DIRECTORY);
-        $this->actionService->modifyRecord(
+        $this->modifyRecord(
             'sys_file_metadata',
             self::FILE_METADATA_UID_REFERENCED_IN_DIRECTORY,
             ['title' => 'testtitle_referenced']
@@ -104,7 +104,7 @@ class CacheOptimizerTest extends CacheOptimizerTestAbstract
     public function fileMetadataChangeClearsCacheForPagesReferencingToTheFile()
     {
         $this->fillPageCache(self::PAGE_UID_REFERENCED_FILE);
-        $this->actionService->modifyRecord(
+        $this->modifyRecord(
             'sys_file_metadata',
             self::FILE_METADATA_UID_REFERENCED,
             ['title' => 'testtitle_referenced_in_dir']
@@ -121,7 +121,7 @@ class CacheOptimizerTest extends CacheOptimizerTestAbstract
     public function pageChangeClearsCacheForRelatedMenusOnDifferentLevel()
     {
         $this->fillPageCache(self::PAGE_UID_CONTAINING_MENU);
-        $this->actionService->modifyRecord(
+        $this->modifyRecord(
             'pages',
             self::PAGE_UID_REFERENCED_IN_MENU_IN_SUBLEVEL,
             ['title' => 'page_referenced_in_menu_modified']
@@ -140,7 +140,7 @@ class CacheOptimizerTest extends CacheOptimizerTestAbstract
     public function pageChangeClearsCacheForRelatedMenusOnSameLevel()
     {
         $this->fillPageCache(self::PAGE_UID_CONTAINING_MENU);
-        $this->actionService->modifyRecord(
+        $this->modifyRecord(
             'pages',
             self::PAGE_UID_REFERENCED_IN_MENU,
             ['title' => 'page_referenced_in_menu_modified']
@@ -157,7 +157,7 @@ class CacheOptimizerTest extends CacheOptimizerTestAbstract
     public function recordChangeClearsCacheForPagesContainingRelatedContents()
     {
         $this->fillPageCache(self::PAGE_UID_CONTAINING_EXT_CONTENT);
-        $this->actionService->modifyRecord(
+        $this->modifyRecord(
             'tx_cacheopttest_domain_model_record',
             self::CACHEOPT_RECORD_UID,
             ['title' => 'testrecord_modified_content']
@@ -174,7 +174,7 @@ class CacheOptimizerTest extends CacheOptimizerTestAbstract
     public function recordChangeClearsCacheForPagesContainingRelatedPlugins()
     {
         $this->fillPageCache(self::PAGE_UID_CONTAINING_EXT_PLUGIN);
-        $this->actionService->modifyRecord(
+        $this->modifyRecord(
             'tx_cacheopttest_domain_model_record',
             self::CACHEOPT_RECORD_UID,
             ['title' => 'testrecord_modified_plugin']

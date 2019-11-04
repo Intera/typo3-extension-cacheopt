@@ -1,4 +1,5 @@
 <?php
+
 namespace Tx\Cacheopt\Tests\Functional;
 
 /*                                                                        *
@@ -11,12 +12,23 @@ namespace Tx\Cacheopt\Tests\Functional;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\CMS\Core\Tests\Functional\DataHandling\AbstractDataHandlerActionTestCase;
+use FilesystemIterator;
+use Nimut\TestingFramework\TestCase\FunctionalTestCase;
+use RecursiveDirectoryIterator;
+use RuntimeException;
+use SplFileInfo;
+use stdClass;
+use Tx\Cacheopt\Tests\Functional\Fixtures\NonCacheClearingFrontendController;
+use TYPO3\CMS\Core\Charset\CharsetConverter;
+use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
+use TYPO3\CMS\Lang\LanguageService;
 
 /**
  * Base class for all functional tests of the cache optimizer.
  */
-abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestCase
+abstract class CacheOptimizerTestAbstract extends FunctionalTestCase
 {
     const PAGE_UID_REFERENCED_DIRECTORY = 131;
 
@@ -31,6 +43,14 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
         '/fileadmin/testdirectory',
         '/fileadmin/testdirectory_referenced',
         '/typo3temp/uploadfiles',
+    ];
+
+    protected $configurationToUseInTestInstance = [
+        'SYS' => [
+            'Objects' => [
+                TypoScriptFrontendController::class => ['className' => NonCacheClearingFrontendController::class],
+            ],
+        ],
     ];
 
     /**
@@ -84,6 +104,40 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
 
         $this->loadDatabaseFixtures();
         $this->copyFilesToTestInstance();
+
+        $GLOBALS['BE_USER'] = $this->setUpBackendUserFromFixture(1);
+
+        $GLOBALS['LANG'] = GeneralUtility::makeInstance(LanguageService::class);
+        $GLOBALS['LANG']->csConvObj = GeneralUtility::makeInstance(CharsetConverter::class);
+    }
+
+    /**
+     * @param string $tableName
+     * @param int $uid
+     * @param array $recordData
+     * @param NULL|array $deleteTableRecordIds
+     */
+    public function modifyRecord($tableName, $uid, array $recordData, array $deleteTableRecordIds = null)
+    {
+        $dataMap = [
+            $tableName => [
+                $uid => $recordData,
+            ],
+        ];
+        $commandMap = [];
+        if (!empty($deleteTableRecordIds)) {
+            foreach ($deleteTableRecordIds as $tableName => $recordIds) {
+                foreach ($recordIds as $recordId) {
+                    $commandMap[$tableName][$recordId]['delete'] = true;
+                }
+            }
+        }
+        $dataHandler = $this->createDataHandler();
+        $dataHandler->start($dataMap, $commandMap);
+        $dataHandler->process_datamap();
+        if (!empty($commandMap)) {
+            $dataHandler->process_cmdmap();
+        }
     }
 
     /**
@@ -104,25 +158,25 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
      */
     protected function assertPageCacheIsFilled($pageUid)
     {
-        $cacheEntries = $this->getDatabaseConnection()->exec_SELECTgetRows(
+        $cacheEntriesCount = $this->getDatabaseConnection()->selectCount(
             'id',
             'cf_cache_pages_tags',
             'tag=\'pageId_' . $pageUid . '\''
         );
-        $this->assertGreaterThanOrEqual(1, count($cacheEntries), 'Page cache for page ' . $pageUid . ' is not filled.');
+        $this->assertGreaterThanOrEqual(1, $cacheEntriesCount, 'Page cache for page ' . $pageUid . ' is not filled.');
     }
 
     /**
      * Copies the files defined in $filesToCopyInTestInstance to the test instance.
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     protected function copyFilesToTestInstance()
     {
         foreach ($this->filesToCopyInTestInstance as $sourcePathToLinkInTestInstance => $destinationPathToLinkInTestInstance) {
             $sourcePath = ORIGINAL_ROOT . '/' . ltrim($sourcePathToLinkInTestInstance, '/');
             if (!file_exists($sourcePath)) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     'Path ' . $sourcePath . ' not found',
                     1376745645
                 );
@@ -130,7 +184,7 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
             $destinationPath = PATH_site . '/' . ltrim($destinationPathToLinkInTestInstance, '/');
             $success = copy($sourcePath, $destinationPath);
             if (!$success) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     'Can not copy the path ' . $sourcePath . ' to ' . $destinationPath,
                     1389969623
                 );
@@ -157,14 +211,17 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
      */
     protected function getPageCacheRecords($pageUid)
     {
-        return $this->getDatabaseConnection()->exec_SELECTgetRows(
+        $row = $this->getDatabaseConnection()->selectSingleRow(
             'cf_cache_pages.id',
             'cf_cache_pages, cf_cache_pages_tags',
-            'cf_cache_pages.identifier=cf_cache_pages_tags.identifier AND tag=\'pageId_' . $pageUid . '\'',
-            '',
-            '',
-            1
+            'cf_cache_pages.identifier=cf_cache_pages_tags.identifier AND tag=\'pageId_' . $pageUid . '\''
         );
+
+        if (!$row) {
+            return [];
+        }
+
+        return [$row];
     }
 
     /**
@@ -173,13 +230,13 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
     protected function loadDatabaseFixtures()
     {
         $fixtureDir = ORIGINAL_ROOT . 'typo3conf/ext/cacheopt/Tests/Functional/Fixtures/Database/';
-        $iteratorMode = \FilesystemIterator::UNIX_PATHS
-            | \FilesystemIterator::SKIP_DOTS
-            | \FilesystemIterator::CURRENT_AS_FILEINFO;
-        $iterator = new \RecursiveDirectoryIterator($fixtureDir, $iteratorMode);
+        $iteratorMode = FilesystemIterator::UNIX_PATHS
+            | FilesystemIterator::SKIP_DOTS
+            | FilesystemIterator::CURRENT_AS_FILEINFO;
+        $iterator = new RecursiveDirectoryIterator($fixtureDir, $iteratorMode);
 
         while ($iterator->valid()) {
-            /** @var $entry \SplFileInfo */
+            /** @var $entry SplFileInfo */
             $entry = $iterator->current();
             // Skip non-files/non-folders, and empty entries.
             if (!$entry->isFile() || $entry->isDir() || $entry->getFilename() === '') {
@@ -189,5 +246,17 @@ abstract class CacheOptimizerTestAbstract extends AbstractDataHandlerActionTestC
             $this->importDataSet($entry->getPathname());
             $iterator->next();
         }
+    }
+
+    /**
+     * @return DataHandler
+     */
+    private function createDataHandler()
+    {
+        $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
+        if (isset($backendUser->uc['copyLevels'])) {
+            $dataHandler->copyTree = $GLOBALS['BE_USER']->uc['copyLevels'];
+        }
+        return $dataHandler;
     }
 }
