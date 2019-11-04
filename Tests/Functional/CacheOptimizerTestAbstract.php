@@ -120,9 +120,7 @@ abstract class CacheOptimizerTestAbstract extends FunctionalTestCase
     public function modifyRecord($tableName, $uid, array $recordData, array $deleteTableRecordIds = null)
     {
         $dataMap = [
-            $tableName => [
-                $uid => $recordData,
-            ],
+            $tableName => [$uid => $recordData],
         ];
         $commandMap = [];
         if (!empty($deleteTableRecordIds)) {
