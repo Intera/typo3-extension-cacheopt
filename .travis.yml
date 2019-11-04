@@ -31,11 +31,6 @@ before_install:
 before_script:
   # First we install all required packages as dist versions.
   - composer require typo3/cms=$TYPO3_VERSION --prefer-dist
-  # Now remove the TYPO3 core and all related symlinks.
-  - rm .Build/vendor/typo3/cms .Build/Web/typo3 .Build/Web/index.php -Rf
-  # Finally we install the TYPO3 core as source version because we need some functional
-  # test classes that are not included in the dist versions.
-  - composer require typo3/cms=$TYPO3_VERSION --prefer-source
   - export TYPO3_PATH_WEB="$PWD/.Build/Web"
   - mkdir -p $TYPO3_PATH_WEB/typo3conf/ext
   - ln -s $PWD $TYPO3_PATH_WEB/typo3conf/ext/cacheopt
