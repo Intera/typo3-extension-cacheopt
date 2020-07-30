@@ -7,4 +7,8 @@
 		<exclude-pattern>Tests/Functional/CacheOptimizerTestAbstract.php</exclude-pattern>
 	</rule>
 
+	<rule ref="Squiz.NamingConventions.ValidVariableName">
+		<exclude-pattern>ext_emconf.php</exclude-pattern>
+		<exclude-pattern>Classes/CacheApi.php</exclude-pattern>
+	</rule>
 </ruleset>
